@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="th" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tony's Kitchen | ครัวโทนี่ - Real Thai Food. Made with Passion.</title>
+    <meta
+      name="description"
+      content="Authentic Thai dishes prepared fresh with bold flavors, quality ingredients, and the comfort of a home-style kitchen. Located at Nichada Thani, Nonthaburi."
+    />
+    
+    <!-- OpenGraph Metadata -->
+    <meta property="og:type" content="restaurant.restaurant" />
+    <meta property="og:title" content="Tony's Kitchen | Authentic Thai Restaurant" />
+    <meta
+      property="og:description"
+      content="Real Thai Food. Made with Passion. Order authentic Thai favorites online via our web app, GrabFood, LINE, or phone."
+    />
+    <meta property="og:site_name" content="Tony's Kitchen" />
+    
+    <!-- Twitter Metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tony's Kitchen | ครัวโทนี่" />
+    <meta
+      name="twitter:description"
+      content="Real Thai Food. Made with Passion. Nichada Thani, Nonthaburi."
+    />
+
+    <!-- Google Fonts: Plus Jakarta Sans & Noto Sans Thai -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Schema.org Restaurant Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Tony's Kitchen",
+      "alternateName": "ครัวโทนี่",
+      "description": "Real Thai Food. Made with Passion. Authentic Thai à la carte and home-style specialties.",
+      "telephone": "+66841536498",
+      "servesCuisine": "Thai",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Samakkhi 29 Alley, Bang Talat, In front of the entrance to Nichada Thani Village",
+        "addressLocality": "Pak Kret District",
+        "addressRegion": "Nonthaburi",
+        "postalCode": "11120",
+        "addressCountry": "TH"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "10:00",
+          "closes": "21:00"
+        }
+      ],
+      "acceptsReservations": "False",
+      "menu": "https://tony-kitchen-thai-restaurant-pwa.ai.studio"
+    }
+    </script>
+  </head>
+  <body class="bg-[#FAF7F2] text-[#1E2022] font-sans antialiased selection:bg-[#2D4A3E] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

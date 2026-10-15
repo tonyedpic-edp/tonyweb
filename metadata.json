@@ -1,0 +1,6 @@
+{
+  "name": "Tony's Kitchen | Authentic Thai Restaurant",
+  "description": "Real Thai Food. Made with Passion. Modern restaurant website for Tony's Kitchen at Nichada Thani with online ordering, bilingual Thai-English menu, and verified contact channels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
