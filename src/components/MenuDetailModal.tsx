@@ -57,7 +57,7 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden border border-[#D5C9B7] flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200 flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -65,7 +65,7 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
           type="button"
           onClick={onClose}
           aria-label={t.modal.closeModal}
-          className="absolute top-4 right-4 z-10 p-2.5 bg-[#FAF7F2]/90 hover:bg-[#FAF7F2] text-[#18181A] rounded-full shadow-md backdrop-blur-xs transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#1F382E]"
+          className="absolute top-4 right-4 z-10 p-2.5 bg-black/60 hover:bg-black/80 text-white rounded-full shadow-md backdrop-blur-xs transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#EA580C]"
         >
           <X className="w-5 h-5" />
         </button>
@@ -73,7 +73,7 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
         {/* Modal Scrollable Body */}
         <div className="overflow-y-auto">
           {/* Header Image */}
-          <div className="relative aspect-16/9 w-full bg-[#E8E1D5]">
+          <div className="relative aspect-16/9 w-full bg-gray-100">
             {item.image ? (
               <img
                 src={item.image}
@@ -82,13 +82,13 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
                 className="w-full h-full object-cover object-center"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#EAE2D5] to-[#D5C9B7] p-8 text-center">
-                <span className="font-serif text-2xl text-[#6B6458] font-bold">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 p-8 text-center">
+                <span className="font-serif text-2xl text-gray-700 font-bold">
                   {primaryName}
                 </span>
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent pointer-events-none" />
 
             {/* Bottom Title & Price Overlay */}
             <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
@@ -97,7 +97,7 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
                   {primaryName}
                 </h3>
                 {secondaryName && (
-                  <span className="text-xs text-stone-200 mt-0.5 block font-sans">
+                  <span className="text-xs text-gray-200 mt-0.5 block font-sans">
                     {secondaryName}
                   </span>
                 )}
@@ -105,14 +105,14 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
 
               <div className="text-right shrink-0">
                 {item.priceVerified && item.price !== undefined ? (
-                  <span className="block text-2xl sm:text-3xl font-serif font-bold text-[#E5C384] tabular-nums">
+                  <span className="block text-2xl sm:text-3xl font-serif font-bold text-[#FACC15] tabular-nums">
                     {item.price}{' '}
                     <span className="text-sm font-sans font-normal text-white">
                       {t.featured.currency}
                     </span>
                   </span>
                 ) : (
-                  <span className="block text-xs text-stone-200">
+                  <span className="block text-xs text-gray-200">
                     {t.menu.contactForPrice}
                   </span>
                 )}
@@ -124,23 +124,23 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
           <div className="p-6 sm:p-8 space-y-6 text-left">
             {/* Description */}
             {description && (
-              <p className="text-sm sm:text-base text-[#4A453E] leading-relaxed">
+              <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
                 {description}
               </p>
             )}
 
             {/* Spice and Dietary Metadata */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-[#6B6458] py-3.5 border-y border-[#E8E2D8]">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[#6B7280] py-3.5 border-y border-gray-100">
               <div className="flex items-center gap-1.5 font-medium">
-                <Flame className={`w-4 h-4 ${item.spiciness > 0 ? 'text-[#C84B31]' : 'text-stone-400'}`} />
+                <Flame className={`w-4 h-4 ${item.spiciness > 0 ? 'text-[#EA580C]' : 'text-gray-400'}`} />
                 <span>{t.modal.spiceLevelTitle}:</span>
-                <span className="font-semibold text-[#18181A]">{getSpiceText(item.spiciness)}</span>
+                <span className="font-semibold text-[#111827]">{getSpiceText(item.spiciness)}</span>
               </div>
 
               {item.isFeatured && (
                 <>
-                  <span aria-hidden="true" className="text-[#C5BDB1]">·</span>
-                  <span className="font-medium text-[#1F382E]">
+                  <span aria-hidden="true" className="text-gray-300">·</span>
+                  <span className="font-semibold text-[#EA580C]">
                     {currentLang === 'th' ? 'เมนูแนะนำประจำร้าน' : 'House Featured Dish'}
                   </span>
                 </>
@@ -150,13 +150,13 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
             {/* Customization Options */}
             {customizations && customizations.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#18181A]">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#111827]">
                   {t.modal.customizationTitle}
                 </h4>
                 <ul className="space-y-1.5">
                   {customizations.map((custom, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-xs text-[#554E44]">
-                      <Check className="w-3.5 h-3.5 text-[#1F382E] shrink-0 mt-0.5" />
+                    <li key={idx} className="flex items-start gap-2 text-xs text-[#4B5563]">
+                      <Check className="w-3.5 h-3.5 text-[#EA580C] shrink-0 mt-0.5" />
                       <span>{custom}</span>
                     </li>
                   ))}
@@ -166,7 +166,7 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
 
             {/* Real Ordering Channels */}
             <div className="pt-2 space-y-3">
-              <span className="block text-xs font-semibold uppercase tracking-wider text-[#696156]">
+              <span className="block text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {currentLang === 'th' ? 'เลือกช่องทางสั่งอาหารจานนี้' : 'Order this dish through'}
               </span>
 
@@ -175,10 +175,10 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
                   href={RESTAURANT_DATA.links.app}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#1F382E] text-[#FAF7F2] hover:bg-[#162720] transition-colors text-xs font-bold shadow-2xs"
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#EA580C] text-white hover:bg-[#C2410C] transition-colors text-xs font-bold shadow-2xs"
                 >
                   <span>{t.modal.orderViaApp}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[#D4A373]" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[#FACC15]" />
                 </a>
 
                 <a
@@ -204,9 +204,9 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
 
                 <a
                   href={`tel:${RESTAURANT_DATA.phoneRaw}`}
-                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#EFE8DC] text-[#18181A] hover:bg-[#E2D9CC] transition-colors text-xs font-semibold"
+                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gray-100 text-[#111827] hover:bg-gray-200 transition-colors text-xs font-semibold"
                 >
-                  <Phone className="w-3.5 h-3.5 text-[#1F382E]" />
+                  <Phone className="w-3.5 h-3.5 text-[#EA580C]" />
                   <span>{RESTAURANT_DATA.phone}</span>
                 </a>
               </div>

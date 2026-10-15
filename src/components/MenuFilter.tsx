@@ -24,7 +24,7 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
     <div className="space-y-4 mb-12 max-w-4xl mx-auto">
       {/* Live Search Input */}
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#736B5E]">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
           <Search className="w-4 h-4" aria-hidden="true" />
         </div>
         <input
@@ -33,14 +33,14 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t.menu.searchPlaceholder}
           aria-label={t.menu.searchPlaceholder}
-          className="w-full pl-11 pr-11 py-3.5 text-sm bg-[#FFFFFF] border border-[#D5C9B7] rounded-xl text-[#18181A] placeholder-[#8C8375] focus:outline-hidden focus:ring-2 focus:ring-[#1F382E] focus:border-transparent transition-all shadow-2xs"
+          className="w-full pl-11 pr-11 py-3.5 text-sm bg-white border border-gray-300 rounded-xl text-[#111827] placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#EA580C] focus:border-transparent transition-all shadow-2xs"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={() => onSearchChange('')}
             aria-label="Clear search query"
-            className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#8C8375] hover:text-[#18181A] cursor-pointer"
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#111827] cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -64,10 +64,10 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
               aria-selected={isActive}
               type="button"
               onClick={() => onSelectCategory(cat.id)}
-              className={`px-4 py-2.5 rounded-lg whitespace-nowrap transition-all duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1F382E] ${
+              className={`px-4 py-2.5 rounded-lg whitespace-nowrap transition-all duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EA580C] ${
                 isActive
-                  ? 'bg-[#1F382E] text-[#FAF7F2] font-semibold shadow-xs'
-                  : 'bg-[#EAE3D6] text-[#4A453E] hover:bg-[#DDD3C2] hover:text-[#18181A]'
+                  ? 'bg-[#111827] text-white font-semibold shadow-xs border border-[#F59E0B]'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-black border border-gray-200'
               }`}
             >
               {categoryName}

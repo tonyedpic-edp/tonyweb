@@ -39,20 +39,20 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ currentLang, onSelectI
   }, [selectedCategory, searchQuery]);
 
   return (
-    <section id="menu" className="py-18 sm:py-24 bg-[#FAF7F2] border-b border-[#E8E2D8]">
+    <section id="menu" className="py-18 sm:py-24 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#1F382E] mb-3">
-            <Utensils className="w-3.5 h-3.5 text-[#C89B3C]" />
+          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-[#EA580C] mb-3">
+            <Utensils className="w-3.5 h-3.5 text-[#F59E0B]" />
             <span>{t.menu.kicker}</span>
           </div>
 
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#18181A] mb-4 [text-wrap:balance]">
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#111827] mb-4 [text-wrap:balance]">
             {t.menu.title}
           </h2>
 
-          <p className="text-base text-[#615A4F] leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base text-[#4B5563] leading-relaxed max-w-2xl mx-auto">
             {t.menu.subtitle}
           </p>
         </div>
@@ -80,12 +80,12 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ currentLang, onSelectI
           </div>
         ) : (
           /* Empty State */
-          <div className="max-w-md mx-auto text-center py-16 px-6 bg-[#FFFFFF] rounded-2xl border border-[#E5DDD0] shadow-2xs">
-            <Utensils className="w-10 h-10 text-[#A39B8F] mx-auto mb-3 opacity-60" />
-            <h3 className="font-serif text-xl font-bold text-[#18181A] mb-1">
+          <div className="max-w-md mx-auto text-center py-16 px-6 bg-white rounded-2xl border border-gray-200 shadow-2xs">
+            <Utensils className="w-10 h-10 text-gray-400 mx-auto mb-3 opacity-60" />
+            <h3 className="font-serif text-xl font-bold text-[#111827] mb-1">
               {t.menu.noResultsTitle}
             </h3>
-            <p className="text-xs text-[#6B6458] mb-6 leading-relaxed">
+            <p className="text-xs text-[#4B5563] mb-6 leading-relaxed">
               {t.menu.noResultsDesc}
             </p>
             <button
@@ -94,7 +94,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ currentLang, onSelectI
                 setSearchQuery('');
                 setSelectedCategory('all');
               }}
-              className="px-5 py-2.5 text-xs font-bold tracking-wider uppercase text-[#FAF7F2] bg-[#1F382E] hover:bg-[#162720] rounded-lg transition-colors cursor-pointer"
+              className="px-5 py-2.5 text-xs font-bold tracking-wider uppercase text-white bg-[#EA580C] hover:bg-[#C2410C] rounded-lg transition-colors cursor-pointer"
             >
               {t.menu.resetSearch}
             </button>
@@ -102,7 +102,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ currentLang, onSelectI
         )}
 
         {/* Verified Pricing Note */}
-        <div className="mt-12 text-center text-xs text-[#8C8375]">
+        <div className="mt-12 text-center text-xs text-gray-400">
           <p>{t.menu.verifiedPriceNote}</p>
         </div>
       </div>
