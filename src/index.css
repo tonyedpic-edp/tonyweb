@@ -8,15 +8,16 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #FFFFFF;
-    color: #111827;
+    background-color: #0B0F17;
+    color: #F9FAFB;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   /* Smooth scroll offset for fixed header */
   html {
-    scroll-padding-top: 5.5rem;
+    scroll-padding-top: 7rem;
+    background-color: #0B0F17;
   }
 }
 
@@ -35,12 +36,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #F3F4F6;
+  background: #0B0F17;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
+  background: #1F2937;
   border-radius: 4px;
+  border: 1px solid #374151;
 }
 
 ::-webkit-scrollbar-thumb:hover {

@@ -1,15 +1,23 @@
 import React from 'react';
 import { Phone, MessageCircle, ExternalLink } from 'lucide-react';
-import { RESTAURANT_DATA } from '../data/restaurant';
+import { RESTAURANT_DATA, RestaurantData } from '../data/restaurant';
 import { Language, TRANSLATIONS } from '../data/translations';
 
 interface FooterProps {
   currentLang: Language;
   onNavigate?: (view: 'home' | 'menu', sectionId?: string) => void;
+  customLogo?: string | null;
+  restaurantData?: RestaurantData;
 }
 
-export const Footer: React.FC<FooterProps> = ({ currentLang, onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({
+  currentLang,
+  onNavigate,
+  customLogo,
+  restaurantData,
+}) => {
   const t = TRANSLATIONS[currentLang];
+  const restaurant = restaurantData || RESTAURANT_DATA;
   const currentYear = new Date().getFullYear();
 
   const handleLink = (view: 'home' | 'menu', sectionId?: string) => {
@@ -19,21 +27,29 @@ export const Footer: React.FC<FooterProps> = ({ currentLang, onNavigate }) => {
   };
 
   return (
-    <footer className="bg-[#111827] text-white pt-18 pb-14 border-t border-gray-800">
+    <footer className="bg-[#0B0F17] text-white pt-18 pb-14 border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-14 border-b border-gray-800 text-left">
           {/* Brand Column (4 cols) */}
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-3.5 mb-4">
-              <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-serif text-lg font-bold border-2 border-[#F59E0B] shadow-xs">
-                TK
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-black text-white flex items-center justify-center font-serif text-2xl sm:text-3xl font-bold border-2 border-[#F59E0B] shadow-md overflow-hidden shrink-0">
+                {customLogo ? (
+                  <img
+                    src={customLogo}
+                    alt={restaurant.name.en}
+                    className="w-full h-full object-contain p-1"
+                  />
+                ) : (
+                  <span className="text-[#FACC15]">TK</span>
+                )}
               </div>
               <div>
-                <span className="block font-serif text-2xl font-bold tracking-tight text-white leading-tight">
-                  Tony's Kitchen
+                <span className="block font-serif text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+                  {restaurant.name.en}
                 </span>
-                <span className="block text-xs font-sans text-[#A89F91]">
-                  {currentLang === 'th' ? 'ครัวโทนี่ · อาหารไทยแท้' : 'Real Thai Food. Made with Passion.'}
+                <span className="block text-xs sm:text-sm font-sans text-gray-400 mt-0.5">
+                  {currentLang === 'th' ? restaurant.name.th : restaurant.tagline.en}
                 </span>
               </div>
             </div>

@@ -8,6 +8,8 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { MenuDetailModal } from './components/MenuDetailModal';
+import { OwnerAuthModal } from './components/OwnerAuthModal';
+import { OwnerDashboardModal } from './components/OwnerDashboardModal';
 import { HeroSection } from './sections/HeroSection';
 import { FeaturedDishes } from './sections/FeaturedDishes';
 import { MenuSection } from './sections/MenuSection';
@@ -16,6 +18,13 @@ import { OrderSection } from './sections/OrderSection';
 import { ContactSection } from './sections/ContactSection';
 import { MenuItem } from './data/menu';
 import { Language, TRANSLATIONS } from './data/translations';
+import {
+  getStoredLogo,
+  getEffectiveRestaurantData,
+  isOwnerLoggedIn,
+  setOwnerLoggedIn,
+} from './data/ownerStore';
+import { RestaurantData } from './data/restaurant';
 
 export default function App() {
   const [currentLang, setCurrentLang] = useState<Language>(() => {
@@ -29,7 +38,46 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'menu'>('home');
   const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
 
+  const [isOwnerAuthOpen, setIsOwnerAuthOpen] = useState(false);
+  const [isOwnerDashboardOpen, setIsOwnerDashboardOpen] = useState(false);
+  const [isOwner, setIsOwner] = useState<boolean>(() => isOwnerLoggedIn());
+  const [ownerActiveTab, setOwnerActiveTab] = useState<
+    'categories' | 'dishes' | 'logo' | 'info' | 'security'
+  >('categories');
+  const [customLogo, setCustomLogo] = useState<string | null>(getStoredLogo);
+  const [restaurantData, setRestaurantData] = useState<RestaurantData>(getEffectiveRestaurantData);
+
+  // Sync owner auth state
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setIsOwner(isOwnerLoggedIn());
+    };
+    window.addEventListener('tonys_owner_auth_changed', handleAuthChange);
+    return () => window.removeEventListener('tonys_owner_auth_changed', handleAuthChange);
+  }, []);
+
+  const handleOpenOwner = (
+    tab: 'categories' | 'dishes' | 'logo' | 'info' | 'security' = 'categories'
+  ) => {
+    setOwnerActiveTab(tab);
+    if (isOwnerLoggedIn()) {
+      setIsOwnerDashboardOpen(true);
+    } else {
+      setIsOwnerAuthOpen(true);
+    }
+  };
+
   const t = TRANSLATIONS[currentLang];
+
+  // Sync custom logo & restaurant data when updated from owner storage
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      setCustomLogo(getStoredLogo());
+      setRestaurantData(getEffectiveRestaurantData());
+    };
+    window.addEventListener('tonys_restaurant_updated', handleStorageUpdate);
+    return () => window.removeEventListener('tonys_restaurant_updated', handleStorageUpdate);
+  }, []);
 
   const handleToggleLang = () => {
     setCurrentLang((prev) => {
@@ -61,13 +109,16 @@ export default function App() {
   }, [currentLang]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#111827] font-sans antialiased selection:bg-[#EA580C] selection:text-white">
-      {/* Accessible Header with Nav, View Switcher & Language Switcher */}
+    <div className="min-h-screen flex flex-col bg-[#0B0F17] text-[#F9FAFB] font-sans antialiased selection:bg-[#EA580C] selection:text-white">
+      {/* Accessible Header with Nav, View Switcher, Language Switcher & 5-Click Owner Trigger */}
       <Header
         currentLang={currentLang}
         onToggleLang={handleToggleLang}
         currentView={currentView}
         onNavigate={handleNavigate}
+        onTriggerOwnerAuth={() => setIsOwnerAuthOpen(true)}
+        customLogo={customLogo}
+        restaurantData={restaurantData}
       />
 
       {/* Main Single-Page Sections */}
@@ -90,7 +141,7 @@ export default function App() {
           /* DEDICATED MENU VIEW: Interactive Full Menu & Category Search */
           <div className="animate-in fade-in duration-300">
             {/* Top Navigation Strip */}
-            <div className="bg-[#111827] text-white py-8 border-b border-gray-800">
+            <div className="bg-[#0B0F17] text-white py-8 border-b border-gray-800">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <button
@@ -128,7 +179,16 @@ export default function App() {
             </div>
 
             {/* Complete Menu Section with Search, Filter & Cards */}
-            <MenuSection currentLang={currentLang} onSelectItem={setSelectedDish} />
+            <MenuSection
+              currentLang={currentLang}
+              onSelectItem={setSelectedDish}
+              onOpenOwner={handleOpenOwner}
+              isOwner={isOwner}
+              onLogoutOwner={() => {
+                setOwnerLoggedIn(false);
+                setIsOwner(false);
+              }}
+            />
 
             {/* Featured Specialties */}
             <FeaturedDishes currentLang={currentLang} onSelectItem={setSelectedDish} />
@@ -139,14 +199,42 @@ export default function App() {
         )}
       </main>
 
-      {/* Minimal Footer */}
-      <Footer currentLang={currentLang} onNavigate={handleNavigate} />
+      {/* Minimal Footer with Custom Logo support */}
+      <Footer
+        currentLang={currentLang}
+        onNavigate={handleNavigate}
+        customLogo={customLogo}
+        restaurantData={restaurantData}
+      />
 
       {/* Dish Detail Dialog */}
       <MenuDetailModal
         item={selectedDish}
         onClose={() => setSelectedDish(null)}
         currentLang={currentLang}
+      />
+
+      {/* Owner Authentication Modal (Triggered by 5 clicks on logo or Owner tools) */}
+      <OwnerAuthModal
+        isOpen={isOwnerAuthOpen}
+        onClose={() => setIsOwnerAuthOpen(false)}
+        onSuccess={() => {
+          setOwnerLoggedIn(true);
+          setIsOwner(true);
+          setIsOwnerAuthOpen(false);
+          setIsOwnerDashboardOpen(true);
+        }}
+      />
+
+      {/* Owner Dashboard Modal (Categories, Dishes & Photos, Logo upload, edit restaurant info, password) */}
+      <OwnerDashboardModal
+        isOpen={isOwnerDashboardOpen}
+        initialTab={ownerActiveTab}
+        onClose={() => setIsOwnerDashboardOpen(false)}
+        onLogoUpdated={() => {
+          setCustomLogo(getStoredLogo());
+          setRestaurantData(getEffectiveRestaurantData());
+        }}
       />
     </div>
   );

@@ -13,7 +13,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
   const t = TRANSLATIONS[currentLang];
 
   return (
-    <section id="home" className="relative overflow-hidden bg-white pt-10 pb-18 lg:pt-16 lg:pb-24 border-b border-gray-100">
+    <section id="home" className="relative overflow-hidden bg-[#0B0F17] pt-10 pb-18 lg:pt-16 lg:pb-24 border-b border-gray-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
           {/* Left Column: Editorial Introduction to the Restaurant (7 cols) */}
@@ -22,17 +22,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
             <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wider uppercase text-[#EA580C] mb-5">
               <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
               <span>{t.hero.kicker}</span>
-              <span aria-hidden="true" className="text-gray-300">·</span>
-              <span className="text-[#4B5563] font-medium">{t.hero.authenticBadge}</span>
+              <span aria-hidden="true" className="text-gray-600">·</span>
+              <span className="text-gray-400 font-medium">{t.hero.authenticBadge}</span>
             </div>
 
-            {/* Main Headline (Deep Black) */}
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#111827] leading-[1.12] mb-6 [text-wrap:balance]">
+            {/* Main Headline (Crisp White in Luxury Black Theme) */}
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.12] mb-6 [text-wrap:balance]">
               {t.hero.headline}
             </h1>
 
             {/* Supporting Copy */}
-            <p className="text-base sm:text-lg text-[#4B5563] leading-relaxed max-w-xl mb-8 font-sans">
+            <p className="text-base sm:text-lg text-gray-300 leading-relaxed max-w-xl mb-8 font-sans">
               {t.hero.subheadline}
             </p>
 
@@ -41,7 +41,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
               <button
                 type="button"
                 onClick={onExploreMenu}
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 text-xs font-bold tracking-wider uppercase text-white bg-[#EA580C] hover:bg-[#C2410C] rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-[#EA580C]"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 text-xs font-bold tracking-wider uppercase text-white bg-[#EA580C] hover:bg-[#C2410C] rounded-lg shadow-md shadow-orange-600/25 hover:shadow-lg hover:shadow-orange-600/35 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-[#EA580C]"
               >
                 <span>{t.hero.exploreMenu}</span>
                 <ArrowRight className="w-4 h-4 text-[#FACC15]" />
@@ -49,47 +49,47 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
 
               <a
                 href="#order"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-wider uppercase text-white bg-[#111827] hover:bg-black rounded-lg transition-all hover:-translate-y-0.5 active:translate-y-0 text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-[#111827]"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-xs font-bold tracking-wider uppercase text-white bg-[#111827] hover:bg-black rounded-lg border border-[#F59E0B]/50 hover:border-[#F59E0B] shadow-2xs hover:shadow-xs transition-all hover:-translate-y-0.5 active:translate-y-0 text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-[#111827]"
               >
                 <span>{t.hero.orderOnline}</span>
               </a>
             </div>
 
             {/* Architectural Trust & Info Strip */}
-            <div className="pt-8 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 text-xs text-[#4B5563]">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#FFF7ED] flex items-center justify-center shrink-0 border border-[#FED7AA]">
+            <div className="pt-8 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 text-xs text-gray-300">
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-[#111827] border border-gray-800">
+                <div className="w-8 h-8 rounded-lg bg-orange-950/60 flex items-center justify-center shrink-0 border border-orange-500/40">
                   <Clock className="w-4 h-4 text-[#EA580C]" />
                 </div>
                 <div>
-                  <span className="block font-semibold text-[#111827] text-xs mb-0.5">{t.hero.hoursLabel}</span>
-                  <span className="text-[#6B7280] leading-normal">{currentLang === 'th' ? RESTAURANT_DATA.hours.th : RESTAURANT_DATA.hours.en}</span>
+                  <span className="block font-semibold text-white text-xs mb-0.5">{t.hero.hoursLabel}</span>
+                  <span className="text-gray-400 leading-normal">{currentLang === 'th' ? RESTAURANT_DATA.hours.th : RESTAURANT_DATA.hours.en}</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#FEF3C7] flex items-center justify-center shrink-0 border border-[#FDE68A]">
-                  <MapPin className="w-4 h-4 text-[#B45309]" />
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-[#111827] border border-gray-800">
+                <div className="w-8 h-8 rounded-lg bg-amber-950/60 flex items-center justify-center shrink-0 border border-amber-500/40">
+                  <MapPin className="w-4 h-4 text-[#F59E0B]" />
                 </div>
                 <div>
-                  <span className="block font-semibold text-[#111827] text-xs mb-0.5">
+                  <span className="block font-semibold text-white text-xs mb-0.5">
                     {currentLang === 'th' ? 'ทำเลที่ตั้ง' : 'Location'}
                   </span>
-                  <span className="text-[#6B7280] leading-normal">
+                  <span className="text-gray-400 leading-normal">
                     {currentLang === 'th' ? RESTAURANT_DATA.address.landmarkTh : RESTAURANT_DATA.address.landmarkEn}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#FFF7ED] flex items-center justify-center shrink-0 border border-[#FED7AA]">
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-[#111827] border border-gray-800">
+                <div className="w-8 h-8 rounded-lg bg-orange-950/60 flex items-center justify-center shrink-0 border border-orange-500/40">
                   <Phone className="w-4 h-4 text-[#EA580C]" />
                 </div>
                 <div>
-                  <span className="block font-semibold text-[#111827] text-xs mb-0.5">{t.hero.phoneLabel}</span>
+                  <span className="block font-semibold text-white text-xs mb-0.5">{t.hero.phoneLabel}</span>
                   <a
                     href={`tel:${RESTAURANT_DATA.phoneRaw}`}
-                    className="text-[#EA580C] font-semibold hover:underline underline-offset-2 block"
+                    className="text-[#FACC15] hover:text-[#EA580C] font-semibold hover:underline underline-offset-2 block"
                   >
                     {RESTAURANT_DATA.phone}
                   </a>
@@ -100,8 +100,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
 
           {/* Right Column: Hero Thai Food Photography (5 cols) */}
           <div className="lg:col-span-5 relative">
-            <div className="relative p-2.5 sm:p-3 bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-200">
-              <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-gray-100 aspect-4/3 sm:aspect-16/10 lg:aspect-4/3">
+            <div className="relative p-2.5 sm:p-3 bg-[#111827] rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-800">
+              <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-gray-900 aspect-4/3 sm:aspect-16/10 lg:aspect-4/3">
                 <img
                   src={heroKrapowImg}
                   alt="Authentic Thai Holy Basil Chicken with Crispy Fried Egg at Tony's Kitchen"

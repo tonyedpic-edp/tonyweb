@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
-import { MENU_CATEGORIES } from '../data/menu';
+import { MENU_CATEGORIES, MenuCategory } from '../data/menu';
 import { Language, TRANSLATIONS } from '../data/translations';
 
 interface MenuFilterProps {
@@ -9,6 +9,7 @@ interface MenuFilterProps {
   onSelectCategory: (id: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  categories?: MenuCategory[];
 }
 
 export const MenuFilter: React.FC<MenuFilterProps> = ({
@@ -17,6 +18,7 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
   onSelectCategory,
   searchQuery,
   onSearchChange,
+  categories = MENU_CATEGORIES,
 }) => {
   const t = TRANSLATIONS[currentLang];
 
@@ -33,14 +35,14 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t.menu.searchPlaceholder}
           aria-label={t.menu.searchPlaceholder}
-          className="w-full pl-11 pr-11 py-3.5 text-sm bg-white border border-gray-300 rounded-xl text-[#111827] placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#EA580C] focus:border-transparent transition-all shadow-2xs"
+          className="w-full pl-11 pr-11 py-3.5 text-sm bg-[#111827] border border-gray-800 rounded-xl text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#EA580C] focus:border-transparent transition-all shadow-xl"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={() => onSearchChange('')}
             aria-label="Clear search query"
-            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#111827] cursor-pointer"
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -53,7 +55,7 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
         aria-label="Menu Categories"
         className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-medium"
       >
-        {MENU_CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const isActive = selectedCategory === cat.id;
           const categoryName = currentLang === 'th' ? cat.nameTh : cat.nameEn;
 
@@ -66,8 +68,8 @@ export const MenuFilter: React.FC<MenuFilterProps> = ({
               onClick={() => onSelectCategory(cat.id)}
               className={`px-4 py-2.5 rounded-lg whitespace-nowrap transition-all duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EA580C] ${
                 isActive
-                  ? 'bg-[#111827] text-white font-semibold shadow-xs border border-[#F59E0B]'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-black border border-gray-200'
+                  ? 'bg-[#EA580C] text-white font-bold shadow-md border border-[#FACC15]/40'
+                  : 'bg-[#111827] text-gray-300 hover:bg-gray-800 hover:text-white border border-gray-800'
               }`}
             >
               {categoryName}

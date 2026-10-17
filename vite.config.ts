@@ -8,11 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ command, mode }) => {
-  // GitHub Pages deployment repository: /tonys-kitchen-website/
-  // Builds are explicitly configured with base: '/tonys-kitchen-website/'
+  // Use relative base ('./') by default for production builds so the site
+  // works seamlessly on any GitHub Pages repository name, user page, or custom domain
   const base =
     process.env.VITE_BASE_PATH ||
-    (command === 'serve' && mode === 'development' ? '/' : '/tonys-kitchen-website/');
+    (command === 'serve' && mode === 'development' ? '/' : './');
 
   return {
     base,
