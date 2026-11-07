@@ -27,6 +27,7 @@ import {
   resetRestaurantOverrides,
   setOwnerPassword,
   optimizeImageFile,
+  setOwnerLoggedIn,
 } from '../data/ownerStore';
 import { RestaurantData, RESTAURANT_DATA } from '../data/restaurant';
 import { OwnerCategoryManager } from './OwnerCategoryManager';
@@ -347,14 +348,27 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors cursor-pointer shrink-0 ml-2"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setOwnerLoggedIn(false);
+                onClose();
+              }}
+              className="text-xs text-gray-300 hover:text-red-400 hover:bg-red-950/40 px-2.5 py-1.5 rounded-lg transition-colors border border-gray-800 cursor-pointer"
+              title="ออกจากโหมด Owner"
+            >
+              ออกจากระบบ
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Status Toast Notification */}

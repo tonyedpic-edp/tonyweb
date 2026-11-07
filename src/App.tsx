@@ -72,6 +72,29 @@ export default function App() {
     }
   };
 
+  // Dedicated Secret Link / URL Param Handler for Owner Access
+  useEffect(() => {
+    const checkOwnerUrl = () => {
+      if (typeof window === 'undefined') return;
+      const hash = (window.location.hash || '').toLowerCase();
+      const search = (window.location.search || '').toLowerCase();
+      if (
+        hash === '#admin' ||
+        hash === '#owner' ||
+        hash === '#manage' ||
+        hash === '#tony' ||
+        search.includes('admin=true') ||
+        search.includes('owner=true')
+      ) {
+        handleOpenOwner('categories');
+      }
+    };
+
+    checkOwnerUrl();
+    window.addEventListener('hashchange', checkOwnerUrl);
+    return () => window.removeEventListener('hashchange', checkOwnerUrl);
+  }, []);
+
   const t = TRANSLATIONS[currentLang];
 
   // Sync custom logo & restaurant data when updated from owner storage
@@ -114,14 +137,14 @@ export default function App() {
   }, [currentLang]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0F17] text-[#F9FAFB] font-sans antialiased selection:bg-[#EA580C] selection:text-white">
-      {/* Accessible Header with Nav, View Switcher, Language Switcher & 5-Click Owner Trigger */}
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#0B0F17] text-[#F9FAFB] font-sans antialiased selection:bg-[#EA580C] selection:text-white">
+      {/* Accessible Header with Nav, View Switcher & Language Switcher */}
       <Header
         currentLang={currentLang}
         onToggleLang={handleToggleLang}
         currentView={currentView}
         onNavigate={handleNavigate}
-        onTriggerOwnerAuth={() => setIsOwnerAuthOpen(true)}
+        onTriggerOwnerAuth={() => handleOpenOwner('categories')}
         customLogo={customLogo}
         restaurantData={restaurantData}
       />
@@ -206,12 +229,13 @@ export default function App() {
         )}
       </main>
 
-      {/* Minimal Footer with Custom Logo support */}
+      {/* Minimal Footer with Custom Logo support & discreet owner trigger */}
       <Footer
         currentLang={currentLang}
         onNavigate={handleNavigate}
         customLogo={customLogo}
         restaurantData={restaurantData}
+        onTriggerOwnerAuth={() => handleOpenOwner('categories')}
       />
 
       {/* Dish Detail Dialog */}

@@ -25,9 +25,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const clickCountRef = useRef(0);
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [clickCountToast, setClickCountToast] = useState<number | null>(null);
 
   const t = TRANSLATIONS[currentLang];
   const restaurant = restaurantData || RESTAURANT_DATA;
@@ -47,37 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
     onNavigate(view, sectionId);
   };
 
-  // Requirement 2: 5 clicks on the logo triggers owner authentication
   const handleBrandClick = () => {
-    clickCountRef.current += 1;
-    const clicks = clickCountRef.current;
-
-    if (clickTimerRef.current) {
-      clearTimeout(clickTimerRef.current);
-    }
-
-    clickTimerRef.current = setTimeout(() => {
-      clickCountRef.current = 0;
-      setClickCountToast(null);
-    }, 3000);
-
-    if (clicks >= 5) {
-      clickCountRef.current = 0;
-      setClickCountToast(null);
-      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-      if (onTriggerOwnerAuth) {
-        onTriggerOwnerAuth();
-      }
-      return;
-    }
-
-    if (clicks >= 2) {
-      setClickCountToast(clicks);
-    }
-
-    if (clicks === 1) {
-      handleLinkClick('home');
-    }
+    handleLinkClick('home');
   };
 
   return (
@@ -88,17 +56,17 @@ export const Header: React.FC<HeaderProps> = ({
           : 'bg-[#0B0F17] border-b border-gray-900'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between min-h-24 py-3 sm:py-4 gap-6 sm:gap-8">
-          {/* Logo / Brand Lockup with 5-click owner mode trigger and custom logo display (100% larger) */}
-          <div className="relative">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between min-h-20 sm:min-h-24 py-2.5 sm:py-4 gap-2 sm:gap-6 w-full max-w-full">
+          {/* Logo / Brand Lockup - Fluid & Responsive on Mobile */}
+          <div className="min-w-0 max-w-[68vw] sm:max-w-none">
             <button
               type="button"
-              className="flex items-center gap-3.5 sm:gap-4.5 text-left group whitespace-nowrap shrink-0 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EA580C] cursor-pointer"
+              className="flex items-center gap-2.5 sm:gap-4 text-left group min-w-0 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EA580C] cursor-pointer"
               onClick={handleBrandClick}
-              title="Tony's Kitchen (คลิก 5 ครั้งเพื่อเข้าโหมด Owner)"
+              title="Tony's Kitchen"
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#111827] text-white flex items-center justify-center font-serif text-2xl sm:text-3xl font-bold shadow-lg border-2 border-[#F59E0B] transition-transform group-hover:scale-105 duration-200 overflow-hidden shrink-0">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl bg-[#111827] text-white flex items-center justify-center font-serif text-xl sm:text-2xl md:text-3xl font-bold shadow-lg border-2 border-[#F59E0B] transition-transform group-hover:scale-105 duration-200 overflow-hidden shrink-0">
                 {customLogo ? (
                   <img
                     src={customLogo}
@@ -109,22 +77,15 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="text-[#FACC15]">TK</span>
                 )}
               </div>
-              <div>
-                <span className="block font-serif text-2xl sm:text-3xl font-bold tracking-tight text-white group-hover:text-[#FACC15] transition-colors leading-tight">
+              <div className="min-w-0">
+                <span className="block font-serif text-lg sm:text-2xl md:text-3xl font-bold tracking-tight text-white group-hover:text-[#FACC15] transition-colors leading-tight truncate">
                   {restaurant.name.en}
                 </span>
-                <span className="block text-xs sm:text-sm font-sans font-medium text-gray-400 tracking-wide mt-0.5">
+                <span className="block text-[10px] sm:text-xs md:text-sm font-sans font-medium text-gray-400 tracking-wide mt-0.5 truncate">
                   {currentLang === 'th' ? restaurant.name.th : restaurant.concept.en}
                 </span>
               </div>
             </button>
-
-            {/* Subtle feedback toast during consecutive clicks */}
-            {clickCountToast && (
-              <div className="absolute -bottom-5 left-0 bg-[#111827] text-[#FACC15] text-[10px] font-bold px-2 py-0.5 rounded shadow-md border border-[#F59E0B] whitespace-nowrap z-50 animate-in fade-in">
-                กดอีก {5 - clickCountToast} ครั้งเพื่อเข้าสู่โหมด Owner
-              </div>
-            )}
           </div>
 
           {/* Desktop Navigation Links */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Clock, MapPin, Phone, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../data/translations';
 import { RESTAURANT_DATA, RestaurantData } from '../data/restaurant';
 import { heroKrapowImg } from '../data/menu';
@@ -15,13 +15,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
   const restaurant = restaurantData || RESTAURANT_DATA;
 
   return (
-    <section id="home" className="relative overflow-hidden bg-[#0B0F17] pt-10 pb-18 lg:pt-16 lg:pb-24 border-b border-gray-800/80">
+    <section id="home" className="relative overflow-hidden bg-[#0B0F17] pt-8 pb-14 sm:pt-12 sm:pb-20 lg:pt-16 lg:pb-24 border-b border-gray-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Left Column: Editorial Introduction to the Restaurant (7 cols) */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
             {/* Subtle editorial kicker (Orange & Yellow accents) */}
-            <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wider uppercase text-[#EA580C] mb-5">
+            <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wider uppercase text-[#EA580C] mb-4 sm:mb-5">
               <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
               <span>{t.hero.kicker}</span>
               <span aria-hidden="true" className="text-gray-600">·</span>
@@ -29,17 +29,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
             </div>
 
             {/* Main Headline (Crisp White in Luxury Black Theme) */}
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.12] mb-6 [text-wrap:balance]">
+            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.15] sm:leading-[1.12] mb-4 sm:mb-6 [text-wrap:balance]">
               {t.hero.headline}
             </h1>
 
             {/* Supporting Copy */}
-            <p className="text-base sm:text-lg text-gray-300 leading-relaxed max-w-xl mb-8 font-sans">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-300 leading-relaxed max-w-xl mb-6 sm:mb-8 font-sans">
               {t.hero.subheadline}
             </p>
 
             {/* Primary & Secondary Action Buttons (Orange & Black) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-2 lg:mb-4">
               <button
                 type="button"
                 onClick={onExploreMenu}
@@ -55,48 +55,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
               >
                 <span>{t.hero.orderOnline}</span>
               </a>
-            </div>
-
-            {/* Architectural Trust & Info Strip */}
-            <div className="pt-8 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 text-xs text-gray-300">
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-[#111827] border border-gray-800">
-                <div className="w-8 h-8 rounded-lg bg-orange-950/60 flex items-center justify-center shrink-0 border border-orange-500/40">
-                  <Clock className="w-4 h-4 text-[#EA580C]" />
-                </div>
-                <div>
-                  <span className="block font-semibold text-white text-xs mb-0.5">{t.hero.hoursLabel}</span>
-                  <span className="text-gray-400 leading-normal">{currentLang === 'th' ? restaurant.hours.th : restaurant.hours.en}</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-[#111827] border border-gray-800">
-                <div className="w-8 h-8 rounded-lg bg-amber-950/60 flex items-center justify-center shrink-0 border border-amber-500/40">
-                  <MapPin className="w-4 h-4 text-[#F59E0B]" />
-                </div>
-                <div>
-                  <span className="block font-semibold text-white text-xs mb-0.5">
-                    {currentLang === 'th' ? 'ทำเลที่ตั้ง' : 'Location'}
-                  </span>
-                  <span className="text-gray-400 leading-normal">
-                    {currentLang === 'th' ? restaurant.address.landmarkTh : restaurant.address.landmarkEn}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-[#111827] border border-gray-800">
-                <div className="w-8 h-8 rounded-lg bg-orange-950/60 flex items-center justify-center shrink-0 border border-orange-500/40">
-                  <Phone className="w-4 h-4 text-[#EA580C]" />
-                </div>
-                <div>
-                  <span className="block font-semibold text-white text-xs mb-0.5">{t.hero.phoneLabel}</span>
-                  <a
-                    href={`tel:${restaurant.phoneRaw}`}
-                    className="text-[#FACC15] hover:text-[#EA580C] font-semibold hover:underline underline-offset-2 block"
-                  >
-                    {restaurant.phone}
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
 

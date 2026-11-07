@@ -8,6 +8,7 @@ interface FooterProps {
   onNavigate?: (view: 'home' | 'menu', sectionId?: string) => void;
   customLogo?: string | null;
   restaurantData?: RestaurantData;
+  onTriggerOwnerAuth?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -15,6 +16,7 @@ export const Footer: React.FC<FooterProps> = ({
   onNavigate,
   customLogo,
   restaurantData,
+  onTriggerOwnerAuth,
 }) => {
   const t = TRANSLATIONS[currentLang];
   const restaurant = restaurantData || RESTAURANT_DATA;
@@ -214,7 +216,20 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-          <p>© {currentYear} Tony's Kitchen. {t.footer.rights}</p>
+          <p>
+            © {currentYear} Tony's Kitchen. {t.footer.rights}
+            {onTriggerOwnerAuth && (
+              <button
+                type="button"
+                onClick={onTriggerOwnerAuth}
+                className="opacity-20 hover:opacity-100 transition-opacity text-gray-500 hover:text-[#FACC15] ml-1.5 cursor-pointer focus:outline-none"
+                title="Owner Portal"
+                aria-label="Owner access"
+              >
+                •
+              </button>
+            )}
+          </p>
           <p className="text-center sm:text-right">{t.footer.verifiedNote}</p>
         </div>
       </div>
