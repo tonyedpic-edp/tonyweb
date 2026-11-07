@@ -91,9 +91,9 @@ export const RESTAURANT_DATA: RestaurantData = {
   },
   links: {
     // Verified official ordering progressive web app
-    app: "https://tony-kitchen-thai-restaurant-pwa.ai.studio",
+    app: "https://tonykitchenth-cloud.github.io/tonypos2/",
     // Verified GrabFood store page link
-    grabFood: "https://food.grab.com/th/en/restaurant/tony-s-kitchen-express-nichada-thani-delivery/",
+    grabFood: "https://app.grab.com/s/0gwvUpSc",
     // Verified LINE contact link
     line: "https://line.me/ti/p/~padaroisauce",
     lineId: "padaroisauce",

@@ -1,16 +1,21 @@
 import React, { useEffect } from 'react';
-import { X, Flame, ExternalLink, Check, Phone } from 'lucide-react';
+import { X, Flame, Check } from 'lucide-react';
 import { MenuItem } from '../data/menu';
 import { Language, TRANSLATIONS } from '../data/translations';
-import { RESTAURANT_DATA } from '../data/restaurant';
+import { RestaurantData } from '../data/restaurant';
 
 interface MenuDetailModalProps {
   item: MenuItem | null;
   onClose: () => void;
   currentLang: Language;
+  restaurantData?: RestaurantData;
 }
 
-export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose, currentLang }) => {
+export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({
+  item,
+  onClose,
+  currentLang,
+}) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -90,33 +95,16 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
 
-            {/* Bottom Title & Price Overlay */}
-            <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
-              <div>
-                <h3 id="dish-detail-title" className="font-serif text-2xl sm:text-3xl font-bold leading-tight drop-shadow-sm text-white">
-                  {primaryName}
-                </h3>
-                {secondaryName && (
-                  <span className="text-xs text-gray-300 mt-0.5 block font-sans">
-                    {secondaryName}
-                  </span>
-                )}
-              </div>
-
-              <div className="text-right shrink-0">
-                {item.priceVerified && item.price !== undefined ? (
-                  <span className="block text-2xl sm:text-3xl font-serif font-bold text-[#FACC15] tabular-nums">
-                    {item.price}{' '}
-                    <span className="text-sm font-sans font-normal text-gray-200">
-                      {t.featured.currency}
-                    </span>
-                  </span>
-                ) : (
-                  <span className="block text-xs text-gray-300">
-                    {t.menu.contactForPrice}
-                  </span>
-                )}
-              </div>
+            {/* Bottom Title Overlay */}
+            <div className="absolute bottom-5 left-6 right-6 text-white">
+              <h3 id="dish-detail-title" className="font-serif text-2xl sm:text-3xl font-bold leading-tight drop-shadow-sm text-white">
+                {primaryName}
+              </h3>
+              {secondaryName && (
+                <span className="text-xs text-gray-300 mt-1 block font-sans">
+                  {secondaryName}
+                </span>
+              )}
             </div>
           </div>
 
@@ -163,54 +151,6 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose,
                 </ul>
               </div>
             )}
-
-            {/* Real Ordering Channels */}
-            <div className="pt-2 space-y-3">
-              <span className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
-                {currentLang === 'th' ? 'เลือกช่องทางสั่งอาหารจานนี้' : 'Order this dish through'}
-              </span>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <a
-                  href={RESTAURANT_DATA.links.app}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#EA580C] text-white hover:bg-[#C2410C] transition-colors text-xs font-bold shadow-md"
-                >
-                  <span>{t.modal.orderViaApp}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[#FACC15]" />
-                </a>
-
-                <a
-                  href={RESTAURANT_DATA.links.grabFood}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#00B14F] text-white hover:bg-[#009A44] transition-colors text-xs font-bold shadow-md"
-                >
-                  <span>{t.modal.orderViaGrab}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 pt-1">
-                <a
-                  href={RESTAURANT_DATA.links.line}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl bg-[#06C755] text-white hover:bg-[#05b04b] transition-colors text-xs font-semibold shadow-xs"
-                >
-                  <span>{t.modal.orderViaLine}</span>
-                </a>
-
-                <a
-                  href={`tel:${RESTAURANT_DATA.phoneRaw}`}
-                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 transition-colors text-xs font-semibold"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#EA580C]" />
-                  <span>{RESTAURANT_DATA.phone}</span>
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </div>

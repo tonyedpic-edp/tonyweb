@@ -134,7 +134,7 @@ export default function App() {
               currentLang={currentLang}
               onExploreMenu={() => handleNavigate('menu')}
             />
-            <OrderSection currentLang={currentLang} />
+            <OrderSection currentLang={currentLang} restaurantData={restaurantData} />
             <ContactSection currentLang={currentLang} />
           </>
         ) : (
@@ -194,7 +194,7 @@ export default function App() {
             <FeaturedDishes currentLang={currentLang} onSelectItem={setSelectedDish} />
 
             {/* Ordering Options */}
-            <OrderSection currentLang={currentLang} />
+            <OrderSection currentLang={currentLang} restaurantData={restaurantData} />
           </div>
         )}
       </main>
@@ -212,6 +212,7 @@ export default function App() {
         item={selectedDish}
         onClose={() => setSelectedDish(null)}
         currentLang={currentLang}
+        restaurantData={restaurantData}
       />
 
       {/* Owner Authentication Modal (Triggered by 5 clicks on logo or Owner tools) */}

@@ -92,22 +92,6 @@ export const MenuCard: React.FC<MenuCardProps> = ({ item, currentLang, onSelect,
             )}
           </div>
         </div>
-
-        {/* Bottom Price on Image */}
-        <div className="absolute bottom-3 right-3">
-          {item.priceVerified && item.price !== undefined ? (
-            <span className="bg-[#111827]/95 text-[#FACC15] font-serif text-lg font-bold px-3 py-1 rounded-lg shadow-sm border border-white/10 tabular-nums">
-              {item.price}{' '}
-              <span className="text-xs font-sans font-normal text-gray-300">
-                {t.featured.currency}
-              </span>
-            </span>
-          ) : (
-            <span className="bg-[#111827]/85 text-gray-300 text-[11px] px-2.5 py-1 rounded-lg backdrop-blur-xs">
-              {t.menu.contactForPrice}
-            </span>
-          )}
-        </div>
       </div>
 
       {/* Card Content Body */}

@@ -1,14 +1,16 @@
 import React from 'react';
 import { Smartphone, Bike, MessageCircle, Phone, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../data/translations';
-import { RESTAURANT_DATA } from '../data/restaurant';
+import { RESTAURANT_DATA, RestaurantData } from '../data/restaurant';
 
 interface OrderSectionProps {
   currentLang: Language;
+  restaurantData?: RestaurantData;
 }
 
-export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang }) => {
+export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang, restaurantData }) => {
   const t = TRANSLATIONS[currentLang];
+  const restaurant = restaurantData || RESTAURANT_DATA;
 
   return (
     <section id="order" className="py-18 sm:py-24 bg-[#0B0F17] border-b border-gray-800/80">
@@ -63,7 +65,7 @@ export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang }) => {
             </div>
 
             <a
-              href={RESTAURANT_DATA.links.app}
+              href={restaurant.links.app}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold uppercase tracking-wider text-white bg-[#EA580C] hover:bg-[#C2410C] rounded-lg transition-colors shadow-2xs hover:shadow-xs"
@@ -101,7 +103,7 @@ export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang }) => {
             </div>
 
             <a
-              href={RESTAURANT_DATA.links.grabFood}
+              href={restaurant.links.grabFood}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold uppercase tracking-wider text-white bg-[#00B14F] hover:bg-[#009A44] rounded-lg transition-colors shadow-2xs hover:shadow-xs"
@@ -133,13 +135,13 @@ export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#06C755] shrink-0" />
-                  <span>ID: {RESTAURANT_DATA.links.lineId}</span>
+                  <span>ID: {restaurant.links.lineId}</span>
                 </div>
               </div>
             </div>
 
             <a
-              href={RESTAURANT_DATA.links.line}
+              href={restaurant.links.line}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold uppercase tracking-wider text-white bg-[#06C755] hover:bg-[#05b04b] rounded-lg transition-colors shadow-2xs hover:shadow-xs"
@@ -177,7 +179,7 @@ export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang }) => {
             </div>
 
             <a
-              href={RESTAURANT_DATA.links.whatsapp}
+              href={restaurant.links.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold uppercase tracking-wider text-white bg-[#25D366] hover:bg-[#20ba59] rounded-lg transition-colors shadow-2xs hover:shadow-xs"
@@ -193,11 +195,11 @@ export const OrderSection: React.FC<OrderSectionProps> = ({ currentLang }) => {
           <p className="text-xs sm:text-sm text-gray-200 flex items-center justify-center flex-wrap gap-1.5">
             <span>{t.orderSection.callDirect}</span>
             <a
-              href={`tel:${RESTAURANT_DATA.phoneRaw}`}
+              href={`tel:${restaurant.phoneRaw}`}
               className="inline-flex items-center gap-1.5 font-bold text-[#FACC15] hover:text-[#EA580C] hover:underline underline-offset-2"
             >
               <Phone className="w-3.5 h-3.5 text-[#EA580C]" />
-              <span>{RESTAURANT_DATA.phone}</span>
+              <span>{restaurant.phone}</span>
             </a>
           </p>
         </div>
