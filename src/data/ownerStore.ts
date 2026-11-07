@@ -27,33 +27,39 @@ let memoryMenuItems: MenuItem[] = MENU_ITEMS;
 let memoryRestaurantData: RestaurantData = RESTAURANT_DATA;
 let memoryLogo: string | null = null;
 
-// Initialize memory state from localStorage on startup
+// Initialize memory state from localStorage on startup with safe parsing
 if (typeof window !== 'undefined') {
   try {
     const cachedCat = localStorage.getItem(OWNER_STORAGE_KEYS.CATEGORIES);
     if (cachedCat) {
       const parsed = JSON.parse(cachedCat);
-      if (Array.isArray(parsed) && parsed.length > 0) memoryCategories = parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        memoryCategories = parsed.filter((c) => c && typeof c === 'object' && c.id);
+      }
     }
 
     const cachedItems = localStorage.getItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
     if (cachedItems) {
       const parsed = JSON.parse(cachedItems);
-      if (Array.isArray(parsed) && parsed.length > 0) memoryMenuItems = parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        memoryMenuItems = parsed.filter((m) => m && typeof m === 'object' && m.id);
+      }
     }
 
     const cachedRest = localStorage.getItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA);
     if (cachedRest) {
       const overrides = JSON.parse(cachedRest);
-      memoryRestaurantData = {
-        ...RESTAURANT_DATA,
-        ...overrides,
-        name: { ...RESTAURANT_DATA.name, ...(overrides.name || {}) },
-        tagline: { ...RESTAURANT_DATA.tagline, ...(overrides.tagline || {}) },
-        address: { ...RESTAURANT_DATA.address, ...(overrides.address || {}) },
-        hours: { ...RESTAURANT_DATA.hours, ...(overrides.hours || {}) },
-        links: { ...RESTAURANT_DATA.links, ...(overrides.links || {}) },
-      };
+      if (overrides && typeof overrides === 'object') {
+        memoryRestaurantData = {
+          ...RESTAURANT_DATA,
+          ...overrides,
+          name: { ...RESTAURANT_DATA.name, ...(overrides.name && typeof overrides.name === 'object' ? overrides.name : {}) },
+          tagline: { ...RESTAURANT_DATA.tagline, ...(overrides.tagline && typeof overrides.tagline === 'object' ? overrides.tagline : {}) },
+          address: { ...RESTAURANT_DATA.address, ...(overrides.address && typeof overrides.address === 'object' ? overrides.address : {}) },
+          hours: { ...RESTAURANT_DATA.hours, ...(overrides.hours && typeof overrides.hours === 'object' ? overrides.hours : {}) },
+          links: { ...RESTAURANT_DATA.links, ...(overrides.links && typeof overrides.links === 'object' ? overrides.links : {}) },
+        };
+      }
     }
 
     memoryLogo = localStorage.getItem(OWNER_STORAGE_KEYS.LOGO);
@@ -340,24 +346,81 @@ export function setOwnerLoggedIn(status: boolean): void {
 }
 
 /**
- * Get restaurant data merged with any saved owner overrides
+ * Get restaurant data merged with any saved owner overrides with deep non-null guarantees
  */
 export function getEffectiveRestaurantData(): RestaurantData {
-  return memoryRestaurantData;
+  const safeData = memoryRestaurantData || RESTAURANT_DATA;
+  const safeName = safeData.name && typeof safeData.name === 'object' ? safeData.name : RESTAURANT_DATA.name;
+  const safeTagline = safeData.tagline && typeof safeData.tagline === 'object' ? safeData.tagline : RESTAURANT_DATA.tagline;
+  const safeAddress = safeData.address && typeof safeData.address === 'object' ? safeData.address : RESTAURANT_DATA.address;
+  const safeHours = safeData.hours && typeof safeData.hours === 'object' ? safeData.hours : RESTAURANT_DATA.hours;
+  const safeLinks = safeData.links && typeof safeData.links === 'object' ? safeData.links : RESTAURANT_DATA.links;
+
+  return {
+    ...RESTAURANT_DATA,
+    ...safeData,
+    name: {
+      en: safeName.en || RESTAURANT_DATA.name.en,
+      th: safeName.th || RESTAURANT_DATA.name.th,
+    },
+    concept: {
+      en: safeData.concept?.en || RESTAURANT_DATA.concept.en,
+      th: safeData.concept?.th || RESTAURANT_DATA.concept.th,
+    },
+    tagline: {
+      en: safeTagline.en || RESTAURANT_DATA.tagline.en,
+      th: safeTagline.th || RESTAURANT_DATA.tagline.th,
+    },
+    supportingText: {
+      en: safeData.supportingText?.en || RESTAURANT_DATA.supportingText.en,
+      th: safeData.supportingText?.th || RESTAURANT_DATA.supportingText.th,
+    },
+    phone: safeData.phone || RESTAURANT_DATA.phone,
+    phoneRaw: safeData.phoneRaw || RESTAURANT_DATA.phoneRaw,
+    address: {
+      en: safeAddress.en || RESTAURANT_DATA.address.en,
+      th: safeAddress.th || RESTAURANT_DATA.address.th,
+      landmarkEn: safeAddress.landmarkEn || RESTAURANT_DATA.address.landmarkEn,
+      landmarkTh: safeAddress.landmarkTh || RESTAURANT_DATA.address.landmarkTh,
+      provinceEn: safeAddress.provinceEn || RESTAURANT_DATA.address.provinceEn,
+      provinceTh: safeAddress.provinceTh || RESTAURANT_DATA.address.provinceTh,
+      postalCode: safeAddress.postalCode || RESTAURANT_DATA.address.postalCode,
+    },
+    hours: {
+      en: safeHours.en || RESTAURANT_DATA.hours.en,
+      th: safeHours.th || RESTAURANT_DATA.hours.th,
+      noteEn: safeHours.noteEn || RESTAURANT_DATA.hours.noteEn,
+      noteTh: safeHours.noteTh || RESTAURANT_DATA.hours.noteTh,
+    },
+    links: {
+      app: safeLinks.app || RESTAURANT_DATA.links.app,
+      grabFood: safeLinks.grabFood || RESTAURANT_DATA.links.grabFood,
+      line: safeLinks.line || RESTAURANT_DATA.links.line,
+      lineId: safeLinks.lineId || RESTAURANT_DATA.links.lineId,
+      whatsapp: safeLinks.whatsapp || RESTAURANT_DATA.links.whatsapp,
+      googleMaps: safeLinks.googleMaps || RESTAURANT_DATA.links.googleMaps,
+      embedMap: safeLinks.embedMap || RESTAURANT_DATA.links.embedMap,
+    },
+    verificationNotes: {
+      en: safeData.verificationNotes?.en || RESTAURANT_DATA.verificationNotes.en,
+      th: safeData.verificationNotes?.th || RESTAURANT_DATA.verificationNotes.th,
+    },
+  };
 }
 
 /**
  * Save restaurant data overrides and sync to Cloud Firestore
  */
 export async function saveRestaurantOverrides(overrides: Partial<RestaurantData>): Promise<void> {
-  const merged = {
-    ...memoryRestaurantData,
+  const current = getEffectiveRestaurantData();
+  const merged: RestaurantData = {
+    ...current,
     ...overrides,
-    name: { ...memoryRestaurantData.name, ...(overrides.name || {}) },
-    tagline: { ...memoryRestaurantData.tagline, ...(overrides.tagline || {}) },
-    address: { ...memoryRestaurantData.address, ...(overrides.address || {}) },
-    hours: { ...memoryRestaurantData.hours, ...(overrides.hours || {}) },
-    links: { ...memoryRestaurantData.links, ...(overrides.links || {}) },
+    name: { ...current.name, ...(overrides.name && typeof overrides.name === 'object' ? overrides.name : {}) },
+    tagline: { ...current.tagline, ...(overrides.tagline && typeof overrides.tagline === 'object' ? overrides.tagline : {}) },
+    address: { ...current.address, ...(overrides.address && typeof overrides.address === 'object' ? overrides.address : {}) },
+    hours: { ...current.hours, ...(overrides.hours && typeof overrides.hours === 'object' ? overrides.hours : {}) },
+    links: { ...current.links, ...(overrides.links && typeof overrides.links === 'object' ? overrides.links : {}) },
   };
   memoryRestaurantData = merged;
 
@@ -391,15 +454,20 @@ export async function saveRestaurantOverrides(overrides: Partial<RestaurantData>
  * =========================================================================
  */
 export function getEffectiveCategories(): MenuCategory[] {
-  return memoryCategories;
+  if (!Array.isArray(memoryCategories) || memoryCategories.length === 0) {
+    return MENU_CATEGORIES;
+  }
+  const filtered = memoryCategories.filter((c) => c && typeof c === 'object' && c.id && c.nameTh);
+  return filtered.length > 0 ? filtered : MENU_CATEGORIES;
 }
 
 export async function saveEffectiveCategories(categories: MenuCategory[]): Promise<void> {
-  memoryCategories = categories;
+  const safeCategories = (categories || []).filter((c) => c && typeof c === 'object' && c.id);
+  memoryCategories = safeCategories.length > 0 ? safeCategories : MENU_CATEGORIES;
 
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(OWNER_STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+      localStorage.setItem(OWNER_STORAGE_KEYS.CATEGORIES, JSON.stringify(memoryCategories));
       window.dispatchEvent(new Event('tonys_menu_updated'));
     } catch (e) {
       console.warn('Local storage write warning', e);
@@ -411,7 +479,7 @@ export async function saveEffectiveCategories(categories: MenuCategory[]): Promi
     await setDoc(
       doc(db, 'settings', 'categories'),
       {
-        list: categories,
+        list: memoryCategories,
         updatedAt: new Date().toISOString(),
       },
       { merge: true }
@@ -422,11 +490,12 @@ export async function saveEffectiveCategories(categories: MenuCategory[]): Promi
 }
 
 export function addCustomCategory(newCategory: MenuCategory): void {
+  if (!newCategory || !newCategory.id) return;
   const current = getEffectiveCategories();
-  const existingIdx = current.findIndex((c) => c.id === newCategory.id);
+  const existingIdx = current.findIndex((c) => c && c.id === newCategory.id);
   let updated: MenuCategory[];
   if (existingIdx >= 0) {
-    updated = current.map((c) => (c.id === newCategory.id ? newCategory : c));
+    updated = current.map((c) => (c && c.id === newCategory.id ? newCategory : c));
   } else {
     updated = [...current, newCategory];
   }
@@ -436,7 +505,7 @@ export function addCustomCategory(newCategory: MenuCategory): void {
 export function deleteCustomCategory(categoryId: string): void {
   if (categoryId === 'all') return; // Cannot delete 'all'
   const current = getEffectiveCategories();
-  const updated = current.filter((c) => c.id !== categoryId);
+  const updated = current.filter((c) => c && c.id !== categoryId);
   saveEffectiveCategories(updated);
 }
 
@@ -446,7 +515,11 @@ export function deleteCustomCategory(categoryId: string): void {
  * =========================================================================
  */
 export function getEffectiveMenuItems(): MenuItem[] {
-  return memoryMenuItems;
+  if (!Array.isArray(memoryMenuItems) || memoryMenuItems.length === 0) {
+    return MENU_ITEMS;
+  }
+  const filtered = memoryMenuItems.filter((m) => m && typeof m === 'object' && m.id && m.nameTh);
+  return filtered.length > 0 ? filtered : MENU_ITEMS;
 }
 
 export async function saveEffectiveMenuItems(items: MenuItem[]): Promise<void> {
