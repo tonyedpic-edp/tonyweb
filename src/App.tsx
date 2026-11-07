@@ -134,13 +134,15 @@ export default function App() {
             <HeroSection
               currentLang={currentLang}
               onExploreMenu={() => handleNavigate('menu')}
+              restaurantData={restaurantData}
             />
             <AboutSection
               currentLang={currentLang}
               onExploreMenu={() => handleNavigate('menu')}
+              restaurantData={restaurantData}
             />
             <OrderSection currentLang={currentLang} restaurantData={restaurantData} />
-            <ContactSection currentLang={currentLang} />
+            <ContactSection currentLang={currentLang} restaurantData={restaurantData} />
           </>
         ) : (
           /* DEDICATED MENU VIEW: Interactive Full Menu & Category Search */
@@ -236,7 +238,11 @@ export default function App() {
       <OwnerDashboardModal
         isOpen={isOwnerDashboardOpen}
         initialTab={ownerActiveTab}
-        onClose={() => setIsOwnerDashboardOpen(false)}
+        onClose={() => {
+          setIsOwnerDashboardOpen(false);
+          setCustomLogo(getStoredLogo());
+          setRestaurantData(getEffectiveRestaurantData());
+        }}
         onLogoUpdated={() => {
           setCustomLogo(getStoredLogo());
           setRestaurantData(getEffectiveRestaurantData());

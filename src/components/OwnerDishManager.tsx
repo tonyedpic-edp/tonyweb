@@ -497,7 +497,7 @@ export const OwnerDishManager: React.FC<OwnerDishManagerProps> = ({
             >
               <div className="flex gap-3.5">
                 {/* Dish Thumbnail */}
-                <div className="relative w-22 h-22 rounded-xl overflow-hidden bg-black border border-gray-800 shrink-0 group">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-black border border-gray-800 shrink-0 group">
                   {dish.image ? (
                     <img
                       src={dish.image}
@@ -619,23 +619,23 @@ export const OwnerDishManager: React.FC<OwnerDishManagerProps> = ({
 
       {/* Edit Dish Modal */}
       {editingDish && (
-        <div className="fixed inset-0 z-60 bg-black/80 flex items-center justify-center p-4 backdrop-blur-xs">
-          <div className="bg-[#111827] rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-gray-800 max-h-[90vh] overflow-y-auto text-white">
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-gray-800">
-              <h4 className="font-bold text-sm text-white flex items-center gap-2">
-                <Edit2 className="w-4 h-4 text-[#FACC15]" />
-                <span>แก้ไขข้อมูลเมนู: {editingDish.nameTh}</span>
+        <div className="fixed inset-0 z-[70] bg-black/85 flex items-center justify-center p-3 sm:p-4 backdrop-blur-xs overflow-hidden">
+          <div className="bg-[#111827] rounded-2xl sm:rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-gray-800 max-h-[90vh] flex flex-col overflow-hidden text-white my-auto">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-800 shrink-0">
+              <h4 className="font-bold text-sm text-white flex items-center gap-2 truncate">
+                <Edit2 className="w-4 h-4 text-[#FACC15] shrink-0" />
+                <span className="truncate">แก้ไขข้อมูลเมนู: {editingDish.nameTh}</span>
               </h4>
               <button
                 type="button"
                 onClick={() => setEditingDish(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white p-1 shrink-0 ml-2"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEditDish} className="space-y-4">
+            <form onSubmit={handleSaveEditDish} className="space-y-4 flex-1 min-h-0 overflow-y-auto pr-1">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-300 mb-1">
                   ชื่อเมนูภาษาไทย

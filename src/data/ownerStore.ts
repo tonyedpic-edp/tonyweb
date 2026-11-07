@@ -426,7 +426,7 @@ export async function saveRestaurantOverrides(overrides: Partial<RestaurantData>
 
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA, JSON.stringify(overrides));
+      localStorage.setItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA, JSON.stringify(merged));
       window.dispatchEvent(new Event('tonys_restaurant_updated'));
     } catch (e) {
       console.warn('Local storage write warning', e);
@@ -438,7 +438,7 @@ export async function saveRestaurantOverrides(overrides: Partial<RestaurantData>
     await setDoc(
       doc(db, 'settings', 'global'),
       {
-        restaurantData: overrides,
+        restaurantData: merged,
         updatedAt: new Date().toISOString(),
       },
       { merge: true }

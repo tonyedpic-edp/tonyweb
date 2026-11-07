@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, MessageCircle, Clock, Copy, Check, ExternalLink, Navigation } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../data/translations';
-import { RESTAURANT_DATA } from '../data/restaurant';
+import { RESTAURANT_DATA, RestaurantData } from '../data/restaurant';
 
 interface ContactSectionProps {
   currentLang: Language;
+  restaurantData?: RestaurantData;
 }
 
-export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) => {
+export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang, restaurantData }) => {
   const [copied, setCopied] = useState(false);
   const t = TRANSLATIONS[currentLang];
+  const restaurant = restaurantData || RESTAURANT_DATA;
 
   const handleCopyAddress = () => {
-    const fullAddress = `${RESTAURANT_DATA.name[currentLang]}, ${RESTAURANT_DATA.address[currentLang]}`;
+    const fullAddress = `${restaurant.name[currentLang]}, ${restaurant.address[currentLang]}`;
     
     // Fallback copy function for restricted iframe sandboxes
     const fallbackCopy = (text: string) => {
@@ -84,7 +86,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
                       {t.contact.addressTitle}
                     </h3>
                     <span className="text-xs text-gray-400">
-                      {currentLang === 'th' ? RESTAURANT_DATA.address.landmarkTh : RESTAURANT_DATA.address.landmarkEn}
+                      {currentLang === 'th' ? restaurant.address.landmarkTh : restaurant.address.landmarkEn}
                     </span>
                   </div>
                 </div>
@@ -110,12 +112,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
               </div>
 
               <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-5">
-                {currentLang === 'th' ? RESTAURANT_DATA.address.th : RESTAURANT_DATA.address.en}
+                {currentLang === 'th' ? restaurant.address.th : restaurant.address.en}
               </p>
 
               <div className="pt-3.5 border-t border-gray-800 flex items-center justify-between">
                 <a
-                  href={RESTAURANT_DATA.links.googleMaps}
+                  href={restaurant.links.googleMaps}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-xs font-bold text-[#FACC15] hover:text-[#EA580C] hover:underline"
@@ -140,11 +142,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
                   </h4>
                 </div>
                 <p className="text-xs font-semibold text-white">
-                  {currentLang === 'th' ? RESTAURANT_DATA.hours.th : RESTAURANT_DATA.hours.en}
+                  {currentLang === 'th' ? restaurant.hours.th : restaurant.hours.en}
                 </p>
-                {RESTAURANT_DATA.hours.noteTh && (
+                {restaurant.hours.noteTh && (
                   <p className="text-[11px] text-gray-400 mt-1 leading-normal">
-                    {currentLang === 'th' ? RESTAURANT_DATA.hours.noteTh : RESTAURANT_DATA.hours.noteEn}
+                    {currentLang === 'th' ? restaurant.hours.noteTh : restaurant.hours.noteEn}
                   </p>
                 )}
               </div>
@@ -160,10 +162,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
                   </h4>
                 </div>
                 <a
-                  href={`tel:${RESTAURANT_DATA.phoneRaw}`}
+                  href={`tel:${restaurant.phoneRaw}`}
                   className="text-sm font-bold text-[#FACC15] hover:text-[#EA580C] transition-colors block"
                 >
-                  {RESTAURANT_DATA.phone}
+                  {restaurant.phone}
                 </a>
                 <span className="text-[11px] text-gray-400 block mt-0.5">
                   {currentLang === 'th' ? 'โทรสั่งอาหารหรือสอบถามทาง' : 'Click to call for orders'}
@@ -187,7 +189,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <a
-                  href={RESTAURANT_DATA.links.line}
+                  href={restaurant.links.line}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-2.5 px-3.5 text-xs font-bold text-white bg-[#06C755] hover:bg-[#05b04b] rounded-lg transition-colors shadow-2xs"
@@ -197,7 +199,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
                 </a>
 
                 <a
-                  href={RESTAURANT_DATA.links.whatsapp}
+                  href={restaurant.links.whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-2.5 px-3.5 text-xs font-bold text-white bg-[#25D366] hover:bg-[#20ba59] rounded-lg transition-colors shadow-2xs"
@@ -215,7 +217,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ currentLang }) =
               <div className="relative w-full aspect-4/3 sm:aspect-16/10 lg:aspect-4/3 rounded-xl sm:rounded-2xl overflow-hidden bg-gray-900 border border-gray-800">
                 <iframe
                   title="Tony's Kitchen Google Maps Location at Nichada Thani Village entrance"
-                  src={RESTAURANT_DATA.links.embedMap}
+                  src={restaurant.links.embedMap}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

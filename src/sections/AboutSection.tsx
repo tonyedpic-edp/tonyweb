@@ -1,16 +1,18 @@
 import React from 'react';
 import { Sparkles, MapPin, ExternalLink, Leaf, Flame, HeartHandshake, ArrowRight } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../data/translations';
-import { RESTAURANT_DATA } from '../data/restaurant';
+import { RESTAURANT_DATA, RestaurantData } from '../data/restaurant';
 import { greenCurryImg } from '../data/menu';
 
 interface AboutSectionProps {
   currentLang: Language;
   onExploreMenu?: () => void;
+  restaurantData?: RestaurantData;
 }
 
-export const AboutSection: React.FC<AboutSectionProps> = ({ currentLang, onExploreMenu }) => {
+export const AboutSection: React.FC<AboutSectionProps> = ({ currentLang, onExploreMenu, restaurantData }) => {
   const t = TRANSLATIONS[currentLang];
+  const restaurant = restaurantData || RESTAURANT_DATA;
 
   return (
     <section id="about" className="py-18 sm:py-24 bg-[#0B0F17] border-b border-gray-800/80">
@@ -91,14 +93,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ currentLang, onExplo
                 <MapPin className="w-4 h-4 text-[#EA580C] shrink-0 mt-0.5" />
                 <div className="text-xs text-gray-300">
                   <span className="font-bold text-white block mb-0.5">
-                    {currentLang === 'th' ? RESTAURANT_DATA.address.landmarkTh : RESTAURANT_DATA.address.landmarkEn}
+                    {currentLang === 'th' ? restaurant.address.landmarkTh : restaurant.address.landmarkEn}
                   </span>
-                  <span className="text-gray-400">{currentLang === 'th' ? RESTAURANT_DATA.address.th : RESTAURANT_DATA.address.en}</span>
+                  <span className="text-gray-400">{currentLang === 'th' ? restaurant.address.th : restaurant.address.en}</span>
                 </div>
               </div>
 
               <a
-                href={RESTAURANT_DATA.links.googleMaps}
+                href={restaurant.links.googleMaps}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:text-[#FACC15] bg-black/60 border border-gray-700 hover:border-[#EA580C] rounded-lg shadow-2xs hover:shadow-xs transition-all whitespace-nowrap shrink-0"

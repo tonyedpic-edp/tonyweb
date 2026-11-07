@@ -1,16 +1,18 @@
 import React from 'react';
 import { ArrowRight, Clock, MapPin, Phone, Sparkles } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../data/translations';
-import { RESTAURANT_DATA } from '../data/restaurant';
+import { RESTAURANT_DATA, RestaurantData } from '../data/restaurant';
 import { heroKrapowImg } from '../data/menu';
 
 interface HeroSectionProps {
   currentLang: Language;
   onExploreMenu?: () => void;
+  restaurantData?: RestaurantData;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExploreMenu }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExploreMenu, restaurantData }) => {
   const t = TRANSLATIONS[currentLang];
+  const restaurant = restaurantData || RESTAURANT_DATA;
 
   return (
     <section id="home" className="relative overflow-hidden bg-[#0B0F17] pt-10 pb-18 lg:pt-16 lg:pb-24 border-b border-gray-800/80">
@@ -63,7 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
                 </div>
                 <div>
                   <span className="block font-semibold text-white text-xs mb-0.5">{t.hero.hoursLabel}</span>
-                  <span className="text-gray-400 leading-normal">{currentLang === 'th' ? RESTAURANT_DATA.hours.th : RESTAURANT_DATA.hours.en}</span>
+                  <span className="text-gray-400 leading-normal">{currentLang === 'th' ? restaurant.hours.th : restaurant.hours.en}</span>
                 </div>
               </div>
 
@@ -76,7 +78,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
                     {currentLang === 'th' ? 'ทำเลที่ตั้ง' : 'Location'}
                   </span>
                   <span className="text-gray-400 leading-normal">
-                    {currentLang === 'th' ? RESTAURANT_DATA.address.landmarkTh : RESTAURANT_DATA.address.landmarkEn}
+                    {currentLang === 'th' ? restaurant.address.landmarkTh : restaurant.address.landmarkEn}
                   </span>
                 </div>
               </div>
@@ -88,10 +90,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ currentLang, onExplore
                 <div>
                   <span className="block font-semibold text-white text-xs mb-0.5">{t.hero.phoneLabel}</span>
                   <a
-                    href={`tel:${RESTAURANT_DATA.phoneRaw}`}
+                    href={`tel:${restaurant.phoneRaw}`}
                     className="text-[#FACC15] hover:text-[#EA580C] font-semibold hover:underline underline-offset-2 block"
                   >
-                    {RESTAURANT_DATA.phone}
+                    {restaurant.phone}
                   </a>
                 </div>
               </div>
