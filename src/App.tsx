@@ -23,10 +23,15 @@ import {
   getEffectiveRestaurantData,
   isOwnerLoggedIn,
   setOwnerLoggedIn,
+  initCloudSync,
 } from './data/ownerStore';
 import { RestaurantData } from './data/restaurant';
 
 export default function App() {
+  // Start Realtime Cloud Firestore synchronization across devices
+  useEffect(() => {
+    initCloudSync();
+  }, []);
   const [currentLang, setCurrentLang] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('tonys_lang');

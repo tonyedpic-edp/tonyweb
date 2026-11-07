@@ -1,5 +1,14 @@
 import { RESTAURANT_DATA, RestaurantData } from './restaurant';
 import { MENU_CATEGORIES, MENU_ITEMS, MenuCategory, MenuItem } from './menu';
+import { db } from './firebase';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  onSnapshot,
+  getDocFromServer,
+} from 'firebase/firestore';
 
 export const OWNER_STORAGE_KEYS = {
   LOGO: 'tonys_custom_logo',
@@ -12,8 +21,156 @@ export const OWNER_STORAGE_KEYS = {
 
 const DEFAULT_PASSWORD = '1234';
 
+// In-memory cache synced with Firestore and backed by localStorage for offline instant render
+let memoryCategories: MenuCategory[] = MENU_CATEGORIES;
+let memoryMenuItems: MenuItem[] = MENU_ITEMS;
+let memoryRestaurantData: RestaurantData = RESTAURANT_DATA;
+let memoryLogo: string | null = null;
+
+// Initialize memory state from localStorage on startup
+if (typeof window !== 'undefined') {
+  try {
+    const cachedCat = localStorage.getItem(OWNER_STORAGE_KEYS.CATEGORIES);
+    if (cachedCat) {
+      const parsed = JSON.parse(cachedCat);
+      if (Array.isArray(parsed) && parsed.length > 0) memoryCategories = parsed;
+    }
+
+    const cachedItems = localStorage.getItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
+    if (cachedItems) {
+      const parsed = JSON.parse(cachedItems);
+      if (Array.isArray(parsed) && parsed.length > 0) memoryMenuItems = parsed;
+    }
+
+    const cachedRest = localStorage.getItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA);
+    if (cachedRest) {
+      const overrides = JSON.parse(cachedRest);
+      memoryRestaurantData = {
+        ...RESTAURANT_DATA,
+        ...overrides,
+        name: { ...RESTAURANT_DATA.name, ...(overrides.name || {}) },
+        tagline: { ...RESTAURANT_DATA.tagline, ...(overrides.tagline || {}) },
+        address: { ...RESTAURANT_DATA.address, ...(overrides.address || {}) },
+        hours: { ...RESTAURANT_DATA.hours, ...(overrides.hours || {}) },
+        links: { ...RESTAURANT_DATA.links, ...(overrides.links || {}) },
+      };
+    }
+
+    memoryLogo = localStorage.getItem(OWNER_STORAGE_KEYS.LOGO);
+  } catch (err) {
+    console.error('Failed to initialize local cache', err);
+  }
+}
+
 /**
- * Optimize uploaded image file to lightweight Base64 string for localStorage
+ * Real-time Firestore Cloud Synchronization
+ * Listens to Firestore collections and documents; whenever an update happens,
+ * all clients across any device immediately receive the latest data.
+ */
+let isCloudSyncInitialized = false;
+
+export function initCloudSync(): void {
+  if (typeof window === 'undefined' || isCloudSyncInitialized) return;
+  isCloudSyncInitialized = true;
+
+  // Validate Firestore server connection
+  getDocFromServer(doc(db, 'settings', 'global')).catch(() => {
+    // Non-blocking initial connectivity verification
+  });
+
+  // 1. Listen to Global Settings (Logo, Restaurant Data Overrides)
+  try {
+    const settingsDocRef = doc(db, 'settings', 'global');
+    onSnapshot(
+      settingsDocRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          if (data) {
+            if (data.logo !== undefined) {
+              memoryLogo = data.logo || null;
+              if (data.logo) {
+                localStorage.setItem(OWNER_STORAGE_KEYS.LOGO, data.logo);
+              } else {
+                localStorage.removeItem(OWNER_STORAGE_KEYS.LOGO);
+              }
+            }
+            if (data.restaurantData) {
+              memoryRestaurantData = {
+                ...RESTAURANT_DATA,
+                ...data.restaurantData,
+                name: { ...RESTAURANT_DATA.name, ...(data.restaurantData.name || {}) },
+                tagline: { ...RESTAURANT_DATA.tagline, ...(data.restaurantData.tagline || {}) },
+                address: { ...RESTAURANT_DATA.address, ...(data.restaurantData.address || {}) },
+                hours: { ...RESTAURANT_DATA.hours, ...(data.restaurantData.hours || {}) },
+                links: { ...RESTAURANT_DATA.links, ...(data.restaurantData.links || {}) },
+              };
+              localStorage.setItem(
+                OWNER_STORAGE_KEYS.RESTAURANT_DATA,
+                JSON.stringify(data.restaurantData)
+              );
+            }
+            window.dispatchEvent(new Event('tonys_restaurant_updated'));
+          }
+        }
+      },
+      (err) => {
+        console.warn('Firestore settings listener note:', err.message);
+      }
+    );
+  } catch (e) {
+    console.error('Failed to attach settings listener', e);
+  }
+
+  // 2. Listen to Categories Document in Cloud
+  try {
+    const categoriesDocRef = doc(db, 'settings', 'categories');
+    onSnapshot(
+      categoriesDocRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          if (data && Array.isArray(data.list) && data.list.length > 0) {
+            memoryCategories = data.list;
+            localStorage.setItem(OWNER_STORAGE_KEYS.CATEGORIES, JSON.stringify(data.list));
+            window.dispatchEvent(new Event('tonys_menu_updated'));
+          }
+        }
+      },
+      (err) => {
+        console.warn('Firestore categories listener note:', err.message);
+      }
+    );
+  } catch (e) {
+    console.error('Failed to attach categories listener', e);
+  }
+
+  // 3. Listen to Menu Items Document in Cloud
+  try {
+    const menuItemsDocRef = doc(db, 'settings', 'menu_items');
+    onSnapshot(
+      menuItemsDocRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          if (data && Array.isArray(data.list) && data.list.length > 0) {
+            memoryMenuItems = data.list;
+            localStorage.setItem(OWNER_STORAGE_KEYS.MENU_ITEMS, JSON.stringify(data.list));
+            window.dispatchEvent(new Event('tonys_menu_updated'));
+          }
+        }
+      },
+      (err) => {
+        console.warn('Firestore menu items listener note:', err.message);
+      }
+    );
+  } catch (e) {
+    console.error('Failed to attach menu items listener', e);
+  }
+}
+
+/**
+ * Optimize uploaded image file to lightweight Base64 string for Firestore and local storage
  */
 export async function optimizeImageFile(
   file: File,
@@ -63,37 +220,64 @@ export async function optimizeImageFile(
  * Get current custom logo data URL or null if using default
  */
 export function getStoredLogo(): string | null {
-  if (typeof window === 'undefined') return null;
+  return memoryLogo;
+}
+
+/**
+ * Save custom logo image and sync to Cloud Firestore
+ */
+export async function setStoredLogo(dataUrl: string): Promise<void> {
+  memoryLogo = dataUrl;
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(OWNER_STORAGE_KEYS.LOGO, dataUrl);
+      window.dispatchEvent(new Event('tonys_restaurant_updated'));
+    } catch (e) {
+      console.warn('Local storage write warning', e);
+    }
+  }
+
+  // Push to Cloud Firestore
   try {
-    return localStorage.getItem(OWNER_STORAGE_KEYS.LOGO);
-  } catch {
-    return null;
+    await setDoc(
+      doc(db, 'settings', 'global'),
+      {
+        logo: dataUrl,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (cloudErr) {
+    console.error('Failed to sync logo to cloud', cloudErr);
   }
 }
 
 /**
- * Save custom logo image data URL
+ * Remove custom logo, restoring default across devices
  */
-export function setStoredLogo(dataUrl: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(OWNER_STORAGE_KEYS.LOGO, dataUrl);
-    window.dispatchEvent(new Event('tonys_restaurant_updated'));
-  } catch (e) {
-    console.error('Failed to save custom logo to localStorage', e);
+export async function removeStoredLogo(): Promise<void> {
+  memoryLogo = null;
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(OWNER_STORAGE_KEYS.LOGO);
+      window.dispatchEvent(new Event('tonys_restaurant_updated'));
+    } catch (e) {
+      console.warn('Local storage remove warning', e);
+    }
   }
-}
 
-/**
- * Remove custom logo, restoring default
- */
-export function removeStoredLogo(): void {
-  if (typeof window === 'undefined') return;
+  // Clear in Cloud Firestore
   try {
-    localStorage.removeItem(OWNER_STORAGE_KEYS.LOGO);
-    window.dispatchEvent(new Event('tonys_restaurant_updated'));
-  } catch (e) {
-    console.error('Failed to remove custom logo', e);
+    await setDoc(
+      doc(db, 'settings', 'global'),
+      {
+        logo: null,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (cloudErr) {
+    console.error('Failed to clear logo in cloud', cloudErr);
   }
 }
 
@@ -159,89 +343,86 @@ export function setOwnerLoggedIn(status: boolean): void {
  * Get restaurant data merged with any saved owner overrides
  */
 export function getEffectiveRestaurantData(): RestaurantData {
-  if (typeof window === 'undefined') return RESTAURANT_DATA;
-  try {
-    const raw = localStorage.getItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA);
-    if (!raw) return RESTAURANT_DATA;
-    const overrides = JSON.parse(raw);
-    return {
-      ...RESTAURANT_DATA,
-      ...overrides,
-      name: {
-        ...RESTAURANT_DATA.name,
-        ...(overrides.name || {}),
-      },
-      tagline: {
-        ...RESTAURANT_DATA.tagline,
-        ...(overrides.tagline || {}),
-      },
-      address: {
-        ...RESTAURANT_DATA.address,
-        ...(overrides.address || {}),
-      },
-      hours: {
-        ...RESTAURANT_DATA.hours,
-        ...(overrides.hours || {}),
-      },
-      links: {
-        ...RESTAURANT_DATA.links,
-        ...(overrides.links || {}),
-      },
-    };
-  } catch {
-    return RESTAURANT_DATA;
-  }
+  return memoryRestaurantData;
 }
 
 /**
- * Save restaurant data overrides
+ * Save restaurant data overrides and sync to Cloud Firestore
  */
-export function saveRestaurantOverrides(overrides: Partial<RestaurantData>): void {
-  if (typeof window === 'undefined') return;
+export async function saveRestaurantOverrides(overrides: Partial<RestaurantData>): Promise<void> {
+  const merged = {
+    ...memoryRestaurantData,
+    ...overrides,
+    name: { ...memoryRestaurantData.name, ...(overrides.name || {}) },
+    tagline: { ...memoryRestaurantData.tagline, ...(overrides.tagline || {}) },
+    address: { ...memoryRestaurantData.address, ...(overrides.address || {}) },
+    hours: { ...memoryRestaurantData.hours, ...(overrides.hours || {}) },
+    links: { ...memoryRestaurantData.links, ...(overrides.links || {}) },
+  };
+  memoryRestaurantData = merged;
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA, JSON.stringify(overrides));
+      window.dispatchEvent(new Event('tonys_restaurant_updated'));
+    } catch (e) {
+      console.warn('Local storage write warning', e);
+    }
+  }
+
+  // Push to Cloud Firestore
   try {
-    const existingRaw = localStorage.getItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA);
-    const existing = existingRaw ? JSON.parse(existingRaw) : {};
-    const merged = { ...existing, ...overrides };
-    localStorage.setItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA, JSON.stringify(merged));
-    window.dispatchEvent(new Event('tonys_restaurant_updated'));
-  } catch (e) {
-    console.error('Failed to save restaurant overrides', e);
+    await setDoc(
+      doc(db, 'settings', 'global'),
+      {
+        restaurantData: overrides,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (cloudErr) {
+    console.error('Failed to sync restaurant overrides to cloud', cloudErr);
   }
 }
 
 /**
  * =========================================================================
- * CATEGORIES MANAGEMENT (Requirement: เพิ่มหมวดหมู่เองได้)
+ * CATEGORIES MANAGEMENT (Synced with Cloud Firestore)
  * =========================================================================
  */
 export function getEffectiveCategories(): MenuCategory[] {
-  if (typeof window === 'undefined') return MENU_CATEGORIES;
-  try {
-    const raw = localStorage.getItem(OWNER_STORAGE_KEYS.CATEGORIES);
-    if (!raw) return MENU_CATEGORIES;
-    const custom = JSON.parse(raw);
-    if (Array.isArray(custom) && custom.length > 0) {
-      return custom;
-    }
-    return MENU_CATEGORIES;
-  } catch {
-    return MENU_CATEGORIES;
-  }
+  return memoryCategories;
 }
 
-export function saveEffectiveCategories(categories: MenuCategory[]): void {
-  if (typeof window === 'undefined') return;
+export async function saveEffectiveCategories(categories: MenuCategory[]): Promise<void> {
+  memoryCategories = categories;
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(OWNER_STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+      window.dispatchEvent(new Event('tonys_menu_updated'));
+    } catch (e) {
+      console.warn('Local storage write warning', e);
+    }
+  }
+
+  // Push to Cloud Firestore
   try {
-    localStorage.setItem(OWNER_STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
-    window.dispatchEvent(new Event('tonys_menu_updated'));
-  } catch (e) {
-    console.error('Failed to save categories', e);
+    await setDoc(
+      doc(db, 'settings', 'categories'),
+      {
+        list: categories,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (cloudErr) {
+    console.error('Failed to sync categories to cloud', cloudErr);
   }
 }
 
 export function addCustomCategory(newCategory: MenuCategory): void {
   const current = getEffectiveCategories();
-  // Ensure 'all' stays first if it exists
   const existingIdx = current.findIndex((c) => c.id === newCategory.id);
   let updated: MenuCategory[];
   if (existingIdx >= 0) {
@@ -261,31 +442,37 @@ export function deleteCustomCategory(categoryId: string): void {
 
 /**
  * =========================================================================
- * MENU ITEMS & DISH IMAGES MANAGEMENT (Requirement: ใส่-เปลี่ยน รูปเมนูอาหารเอง)
+ * MENU ITEMS & DISH IMAGES MANAGEMENT (Synced with Cloud Firestore)
  * =========================================================================
  */
 export function getEffectiveMenuItems(): MenuItem[] {
-  if (typeof window === 'undefined') return MENU_ITEMS;
-  try {
-    const raw = localStorage.getItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
-    if (!raw) return MENU_ITEMS;
-    const custom = JSON.parse(raw);
-    if (Array.isArray(custom) && custom.length > 0) {
-      return custom;
-    }
-    return MENU_ITEMS;
-  } catch {
-    return MENU_ITEMS;
-  }
+  return memoryMenuItems;
 }
 
-export function saveEffectiveMenuItems(items: MenuItem[]): void {
-  if (typeof window === 'undefined') return;
+export async function saveEffectiveMenuItems(items: MenuItem[]): Promise<void> {
+  memoryMenuItems = items;
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(OWNER_STORAGE_KEYS.MENU_ITEMS, JSON.stringify(items));
+      window.dispatchEvent(new Event('tonys_menu_updated'));
+    } catch (e) {
+      console.warn('Local storage write warning', e);
+    }
+  }
+
+  // Push to Cloud Firestore
   try {
-    localStorage.setItem(OWNER_STORAGE_KEYS.MENU_ITEMS, JSON.stringify(items));
-    window.dispatchEvent(new Event('tonys_menu_updated'));
-  } catch (e) {
-    console.error('Failed to save menu items', e);
+    await setDoc(
+      doc(db, 'settings', 'menu_items'),
+      {
+        list: items,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+  } catch (cloudErr) {
+    console.error('Failed to sync menu items to cloud', cloudErr);
   }
 }
 
@@ -318,31 +505,55 @@ export function deleteCustomMenuItem(dishId: string): void {
   saveEffectiveMenuItems(updated);
 }
 
-export function resetMenuOverrides(): void {
-  if (typeof window === 'undefined') return;
+export async function resetMenuOverrides(): Promise<void> {
+  memoryCategories = MENU_CATEGORIES;
+  memoryMenuItems = MENU_ITEMS;
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(OWNER_STORAGE_KEYS.CATEGORIES);
+      localStorage.removeItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
+      window.dispatchEvent(new Event('tonys_menu_updated'));
+    } catch (e) {
+      console.warn('Local storage remove warning', e);
+    }
+  }
+
   try {
-    localStorage.removeItem(OWNER_STORAGE_KEYS.CATEGORIES);
-    localStorage.removeItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
-    window.dispatchEvent(new Event('tonys_menu_updated'));
-  } catch (e) {
-    console.error('Failed to reset menu overrides', e);
+    await deleteDoc(doc(db, 'settings', 'categories'));
+    await deleteDoc(doc(db, 'settings', 'menu_items'));
+  } catch (cloudErr) {
+    console.error('Failed to reset cloud menu overrides', cloudErr);
   }
 }
 
 /**
  * Reset all overrides back to restaurant original data
  */
-export function resetRestaurantOverrides(): void {
-  if (typeof window === 'undefined') return;
+export async function resetRestaurantOverrides(): Promise<void> {
+  memoryRestaurantData = RESTAURANT_DATA;
+  memoryLogo = null;
+  memoryCategories = MENU_CATEGORIES;
+  memoryMenuItems = MENU_ITEMS;
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA);
+      localStorage.removeItem(OWNER_STORAGE_KEYS.LOGO);
+      localStorage.removeItem(OWNER_STORAGE_KEYS.CATEGORIES);
+      localStorage.removeItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
+      window.dispatchEvent(new Event('tonys_restaurant_updated'));
+      window.dispatchEvent(new Event('tonys_menu_updated'));
+    } catch (e) {
+      console.warn('Local storage remove warning', e);
+    }
+  }
+
   try {
-    localStorage.removeItem(OWNER_STORAGE_KEYS.RESTAURANT_DATA);
-    localStorage.removeItem(OWNER_STORAGE_KEYS.LOGO);
-    localStorage.removeItem(OWNER_STORAGE_KEYS.CATEGORIES);
-    localStorage.removeItem(OWNER_STORAGE_KEYS.MENU_ITEMS);
-    window.dispatchEvent(new Event('tonys_restaurant_updated'));
-    window.dispatchEvent(new Event('tonys_menu_updated'));
-  } catch (e) {
-    console.error('Failed to reset restaurant data', e);
+    await deleteDoc(doc(db, 'settings', 'global'));
+    await deleteDoc(doc(db, 'settings', 'categories'));
+    await deleteDoc(doc(db, 'settings', 'menu_items'));
+  } catch (cloudErr) {
+    console.error('Failed to reset all cloud settings', cloudErr);
   }
 }
-

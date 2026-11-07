@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "RestaurantSettings": {
+      "title": "RestaurantSettings",
+      "description": "Global restaurant settings, custom logo, and business details overrides",
+      "type": "object",
+      "properties": {
+        "logo": {
+          "type": "string",
+          "description": "Custom restaurant logo image (base64 or URL)"
+        },
+        "restaurantData": {
+          "type": "object",
+          "description": "Restaurant data overrides"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      }
+    },
+    "MenuCategory": {
+      "title": "MenuCategory",
+      "description": "Food menu category",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique category identifier"
+        },
+        "nameTh": {
+          "type": "string",
+          "description": "Thai category name"
+        },
+        "nameEn": {
+          "type": "string",
+          "description": "English category name"
+        },
+        "descriptionTh": {
+          "type": "string",
+          "description": "Thai description"
+        },
+        "descriptionEn": {
+          "type": "string",
+          "description": "English description"
+        }
+      },
+      "required": ["id", "nameTh"]
+    },
+    "MenuItem": {
+      "title": "MenuItem",
+      "description": "Food menu item dish",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique dish identifier"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Category ID the dish belongs to"
+        },
+        "nameTh": {
+          "type": "string",
+          "description": "Thai dish name"
+        },
+        "nameEn": {
+          "type": "string",
+          "description": "English dish name"
+        },
+        "price": {
+          "type": "number",
+          "description": "Dish price in THB"
+        },
+        "spiciness": {
+          "type": "number",
+          "description": "Spice level (0-3)"
+        },
+        "image": {
+          "type": "string",
+          "description": "Food photo (data URL or web URL)"
+        },
+        "descriptionTh": {
+          "type": "string",
+          "description": "Thai description"
+        },
+        "descriptionEn": {
+          "type": "string",
+          "description": "English description"
+        },
+        "isFeatured": {
+          "type": "boolean",
+          "description": "Whether dish is featured"
+        }
+      },
+      "required": ["id", "categoryId", "nameTh", "nameEn"]
+    }
+  },
+  "firestore": {
+    "/settings/global": {
+      "schema": "RestaurantSettings",
+      "description": "Global restaurant settings, custom logo, and details"
+    },
+    "/categories/{categoryId}": {
+      "schema": "MenuCategory",
+      "description": "Menu categories collection"
+    },
+    "/menu_items/{itemId}": {
+      "schema": "MenuItem",
+      "description": "Dishes and food items collection"
+    }
+  }
+}
