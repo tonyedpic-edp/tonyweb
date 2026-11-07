@@ -24,6 +24,7 @@ import {
   resetRestaurantOverrides,
   setOwnerPassword,
   getOwnerPassword,
+  optimizeImageFile,
 } from '../data/ownerStore';
 import { RestaurantData } from '../data/restaurant';
 import { OwnerCategoryManager } from './OwnerCategoryManager';
@@ -75,8 +76,11 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
     }, 4000);
   };
 
-  // Handle Logo Upload (Requirement 3)
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [pendingLogo, setPendingLogo] = useState<string | null>(null);
+  const [isSavingLogo, setIsSavingLogo] = useState(false);
+
+  // Handle Logo Selection
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -85,32 +89,39 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
       return;
     }
 
-    // Limit to reasonable size for localStorage (e.g. 3MB)
-    if (file.size > 3 * 1024 * 1024) {
-      showToast('ขนาดไฟล์ภาพใหญ่เกินไป (แนะนำไม่เกิน 3MB)', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setStoredLogo(dataUrl);
-        setCurrentLogo(dataUrl);
-        if (onLogoUpdated) onLogoUpdated();
-        showToast('อัปโหลดและเปลี่ยนรูปโลโก้สำเร็จเรียบร้อย!');
+    try {
+      const optimized = await optimizeImageFile(file, 800, 800, 0.85);
+      if (optimized) {
+        setPendingLogo(optimized);
+        showToast('เลือกรูปโลโก้เรียบร้อยแล้ว กรุณากดปุ่ม "บันทึกรูปโลโก้ใหม่" เพื่อนำไปใช้งาน');
       }
-    };
-    reader.onerror = () => {
+    } catch {
       showToast('เกิดข้อผิดพลาดในการอ่านไฟล์ภาพ', 'error');
-    };
-    reader.readAsDataURL(file);
+    }
+  };
+
+  // Explicit Save Logo Button handler
+  const handleSaveLogo = async () => {
+    if (!pendingLogo) return;
+    setIsSavingLogo(true);
+    try {
+      await setStoredLogo(pendingLogo);
+      setCurrentLogo(pendingLogo);
+      setPendingLogo(null);
+      if (onLogoUpdated) onLogoUpdated();
+      showToast('บันทึกและอัปเดตรูปโลโก้ใหม่ขึ้นระบบสำเร็จ ข้อมูลในทุกอุปกรณ์จะอัปเดตทันที!');
+    } catch {
+      showToast('เกิดข้อผิดพลาดในการบันทึกรูปโลโก้', 'error');
+    } finally {
+      setIsSavingLogo(false);
+    }
   };
 
   // Reset Logo
-  const handleResetLogo = () => {
-    removeStoredLogo();
+  const handleResetLogo = async () => {
+    await removeStoredLogo();
     setCurrentLogo(null);
+    setPendingLogo(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (onLogoUpdated) onLogoUpdated();
     showToast('คืนค่าเป็นรูปโลโก้เริ่มต้นเรียบร้อย');
@@ -318,9 +329,9 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                   {/* Round Badge Preview (As seen in Header) */}
                   <div className="text-center">
                     <div className="w-20 h-20 rounded-2xl bg-[#111827] text-white flex items-center justify-center font-serif text-2xl font-bold shadow-md border-2 border-[#F59E0B] mx-auto overflow-hidden">
-                      {currentLogo ? (
+                      {pendingLogo || currentLogo ? (
                         <img
-                          src={currentLogo}
+                          src={pendingLogo || currentLogo!}
                           alt="Tony's Kitchen Logo Preview"
                           className="w-full h-full object-contain p-1"
                         />
@@ -329,16 +340,16 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                       )}
                     </div>
                     <span className="block text-[11px] text-gray-500 mt-2 font-medium">
-                      ขนาดไอคอน Header & Footer (80px - ขยายใหญ่ 100%)
+                      ขนาดไอคอน Header & Footer (80px)
                     </span>
                   </div>
 
                   {/* Card Display Preview */}
                   <div className="flex-1 bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-4">
                     <div className="w-16 h-16 rounded-2xl bg-[#111827] text-white flex items-center justify-center font-serif text-xl font-bold border-2 border-[#F59E0B] shrink-0 overflow-hidden">
-                      {currentLogo ? (
+                      {pendingLogo || currentLogo ? (
                         <img
-                          src={currentLogo}
+                          src={pendingLogo || currentLogo!}
                           alt="Tony's Kitchen Logo"
                           className="w-full h-full object-contain p-1"
                         />
@@ -355,11 +366,17 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                       </p>
                       <div className="mt-1">
                         <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          currentLogo
+                          pendingLogo
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                            : currentLogo
                             ? 'bg-emerald-100 text-emerald-800'
                             : 'bg-gray-100 text-gray-700'
                         }`}>
-                          {currentLogo ? '✓ ใช้โลโก้ที่คุณอัปโหลด' : '✓ ใช้โลโก้เริ่มต้น (TK Emblem)'}
+                          {pendingLogo
+                            ? '⏳ รูปใหม่รอการกดบันทึก'
+                            : currentLogo
+                            ? '✓ ใช้โลโก้ที่คุณอัปโหลดแล้ว'
+                            : '✓ ใช้โลโก้เริ่มต้น (TK Emblem)'}
                         </span>
                       </div>
                     </div>
@@ -367,7 +384,7 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                 </div>
               </div>
 
-              {/* Upload Controls */}
+              {/* Upload Controls & Save Button */}
               <div className="space-y-4">
                 <input
                   ref={fileInputRef}
@@ -378,13 +395,49 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                   className="hidden"
                 />
 
+                {/* Prominent Action Bar when a new image is selected */}
+                {pendingLogo && (
+                  <div className="p-4 rounded-2xl bg-amber-50 border-2 border-[#EA580C] shadow-md animate-in fade-in slide-in-from-top-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-[#EA580C]" />
+                          <span>คุณได้เลือกรูปภาพโลโก้ใหม่แล้ว!</span>
+                        </h4>
+                        <p className="text-xs text-gray-600 mt-0.5 font-sans">
+                          กดปุ่ม &quot;บันทึกรูปโลโก้ใหม่&quot; เพื่อแทนที่รูปเก่าและอัปเดตลง Cloud ให้ลูกค้าทุกคนเห็นทันที
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPendingLogo(null)}
+                          className="px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                        >
+                          ยกเลิก
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isSavingLogo}
+                          onClick={handleSaveLogo}
+                          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          <Save className="w-4 h-4 text-[#FACC15]" />
+                          <span>{isSavingLogo ? 'กำลังบันทึก...' : 'บันทึกรูปโลโก้ใหม่'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col sm:flex-row gap-3">
                   <label
                     htmlFor="logo-file-input"
                     className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold uppercase tracking-wider cursor-pointer shadow-sm hover:shadow-md transition-all text-center"
                   >
                     <Upload className="w-4 h-4 text-[#FACC15]" />
-                    <span>เลือกรูปภาพโลโก้ใหม่จากเครื่อง</span>
+                    <span>{currentLogo ? 'เลือกเปลี่ยนรูปภาพโลโก้ใหม่' : 'เลือกรูปภาพโลโก้จากเครื่อง'}</span>
                   </label>
 
                   {currentLogo && (
@@ -402,11 +455,11 @@ export const OwnerDashboardModal: React.FC<OwnerDashboardModalProps> = ({
                 <div className="p-3.5 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-950 flex items-start gap-2.5">
                   <Info className="w-4 h-4 text-[#EA580C] shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <p className="font-semibold text-orange-900">คำแนะนำในการเลือกรูปโลโก้:</p>
+                    <p className="font-semibold text-orange-900">คำแนะนำในการเปลี่ยนโลโก้ร้าน:</p>
                     <ul className="list-disc list-inside space-y-0.5 text-orange-800 text-[11px]">
-                      <li>รองรับไฟล์ PNG, JPG, WebP หรือ SVG</li>
-                      <li>แนะนำรูปทรงสี่เหลี่ยมจัตุรัส (1:1) หรือรูปวงกลม ความละเอียด 512x512 พิกเซลขึ้นไป</li>
-                      <li>ระบบจะบันทึกลงในหน่วยความจำของบราวเซอร์และแสดงผลทันที</li>
+                      <li>เมื่อกดเลือกรูปจากเครื่องแล้ว จะมีปุ่ม <strong>&quot;บันทึกรูปโลโก้ใหม่&quot;</strong> แสดงขึ้นมาให้กดยืนยัน</li>
+                      <li>เมื่อบันทึกแล้ว ระบบ Cloud Firestore จะส่งรูปโลโก้ใหม่ไปยังมือถือของลูกค้าทุกคนทันที</li>
+                      <li>รองรับไฟล์ PNG, JPG, WebP หรือ SVG แนะนำรูปทรงจัตุรัส (1:1)</li>
                     </ul>
                   </div>
                 </div>
