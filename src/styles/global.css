@@ -20,17 +20,28 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-canvas);
-    color: var(--color-black);
+    background-color: #0B0F17;
+    color: #F9FAFB;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  /* Smooth scroll offset so sticky header does not conceal section headings */
+  /* Force vertical scrollbar and smooth scrolling on ALL devices */
   html {
     scroll-padding-top: 5.5rem;
     scroll-behavior: smooth;
+    background-color: #0B0F17;
+    width: 100%;
+    max-width: 100%;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #EA580C #0B0F17;
   }
 }
 
@@ -47,21 +58,36 @@
   transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease;
 }
 
-/* Custom subtle scrollbar */
+/* ========================================================
+   Prominent, High-Contrast Scrollbar for ALL Devices
+   (Computers, Tablets, Mobile Phones, Touchscreens)
+   ======================================================== */
+html,
+body,
+* {
+  scrollbar-color: #EA580C #0B0F17;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FFFFFF;
+  background: #0B0F17;
+  border-left: 1px solid #1F2937;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E5E7EB;
-  border-radius: 9999px;
+  background-color: #EA580C;
+  border-radius: 6px;
+  border: 2px solid #0B0F17;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D1D5DB;
+  background-color: #F59E0B;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: #C2410C;
 }
